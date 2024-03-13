@@ -29,5 +29,6 @@ db.sequelize = sequelize;
 db.Users = require("../models/user.js")(sequelize, Sequelize);
 db.Parties = require("../models/party.js")(sequelize, Sequelize);
 db.PartieMembers = require("../models/partyMember.js")(sequelize, Sequelize);
+// add new models here
 
 module.exports = db;

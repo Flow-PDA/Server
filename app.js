@@ -9,13 +9,18 @@ var indexRouter = require("./routes/index");
 
 var app = express();
 
-// db connection
+/**
+ * db sync mode
+ * - CREATE_IF_NOT_EXISTS
+ * - DROP_IF_EXISTS
+ * - ALTER_IF_MODIFIED
+ */
 const CREATE_IF_NOT_EXISTS = {};
 const DROP_IF_EXISTS = { force: true };
 const ALTER_IF_MODIFIED = { alter: true };
 
 db.sequelize
-  .sync(CREATE_IF_NOT_EXISTS)
+  .sync(ALTER_IF_MODIFIED) // modify mode here
   .then(() => {
     console.log(`connected to database`);
   })
