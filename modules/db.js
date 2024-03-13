@@ -10,6 +10,8 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
 
   // logging
   logging: console.log,
+  // disable logging
+  // logging: false,
 
   // connection pool
   pool: {
