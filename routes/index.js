@@ -5,7 +5,7 @@ var usersRouter = require('./users');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+  res.status(200).json({msg: "Hello"})
 });
 
 router.use('/users', usersRouter);
