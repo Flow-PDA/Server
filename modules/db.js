@@ -34,7 +34,7 @@ db.PartieMembers = require("../models/partyMember.js")(sequelize, Sequelize);
 db.Stocks = require("../models/stock.js")(sequelize, Sequelize);
 db.InterestStocks = require("../models/interestStock.js")(sequelize, Sequelize);
 db.Participants = require("../models/participant.js")(sequelize, Sequelize);
-db.TransferDetails = require("../models/transferDetails.js")(
+db.TransferDetails = require("../models/transferDetail.js")(
   sequelize,
   Sequelize
 );

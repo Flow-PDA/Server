@@ -1,8 +1,8 @@
 module.exports = (sequelize, Sequelize) => {
   // define model
-  const TransferDetails = sequelize.define(
+  const TransferDetail = sequelize.define(
     // DB table name
-    "Transfer_Details",
+    "Transfer_Detail",
     {
       transferKey: {
         type: Sequelize.INTEGER.UNSIGNED,
@@ -49,5 +49,5 @@ module.exports = (sequelize, Sequelize) => {
     }
   );
 
-  return TransferDetails;
+  return TransferDetail;
 };
