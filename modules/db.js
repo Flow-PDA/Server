@@ -33,7 +33,13 @@ db.Parties = require("../models/party.js")(sequelize, Sequelize);
 db.PartieMembers = require("../models/partyMember.js")(sequelize, Sequelize);
 db.Notifications = require("../models/notification.js")(sequelize, Sequelize);
 db.TransactionDetails = require("../models/transactionDetail.js")(sequelize, Sequelize);
-
+db.Stocks = require("../models/stock.js")(sequelize, Sequelize);
+db.InterestStocks = require("../models/interestStock.js")(sequelize, Sequelize);
+db.Participants = require("../models/participant.js")(sequelize, Sequelize);
+db.TransferDetails = require("../models/transferDetail.js")(
+  sequelize,
+  Sequelize
+);
 // add new models here
 
 module.exports = db;
