@@ -22,11 +22,11 @@ module.exports = (sequelize, Sequelize) => {
         },
       },
       type: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.INTEGER(1),
         defaultValue: 0,
       },
       content: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(30),
       },
       isViewed: {
         type: Sequelize.BOOLEAN,

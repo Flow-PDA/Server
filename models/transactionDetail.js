@@ -1,8 +1,8 @@
 module.exports = (sequelize, Sequelize) => {
   //define model
-  const Transaction = sequelize.define(
+  const TransactionDetail = sequelize.define(
     //DB table name
-    "Transaction",
+    "Transaction_Detail",
     {
       transactionKey: {
         type: Sequelize.INTEGER.UNSIGNED,
@@ -52,5 +52,5 @@ module.exports = (sequelize, Sequelize) => {
       timeStamps: true,
     }
   );
-  return Transaction;
+  return TransactionDetail;
 };
