@@ -61,3 +61,21 @@ module.exports.login = async (loginDto) => {
     ...tokens,
   };
 };
+
+/**
+ * modify user info
+ * @param {Number} userKey user identifier
+ * @param {*} modifyUserDto must contain at least one of name, password, phoneNumber, birth
+ * @returns modified count
+ * @throws SequelizeDatabaseError invalid input
+ */
+module.exports.modify = async (userKey, modifyUserDto) => {
+  const result = await User.update(
+    { ...modifyUserDto },
+    { where: { userKey: userKey } }
+  );
+
+  console.log(result);
+
+  return result;
+};

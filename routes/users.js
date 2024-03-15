@@ -1,12 +1,12 @@
 var express = require("express");
 var router = express.Router();
 // validator
-const { body, param } = require("express-validator");
+const { body, param, oneOf } = require("express-validator");
 const { validatorErrorHanlder } = require("../middlewares/validator.js");
+const { jwtAuthenticator } = require("../middlewares/authenticator.js");
 
 // without service layer
-const { db, jwt } = require("../modules/");
-const User = db.Users;
+const { jwt } = require("../modules/");
 
 // with service layer
 const userService = require("../services/userService.js");
@@ -131,22 +131,47 @@ router.post("/logout", async (req, res, next) => {
   }
 });
 
-// [GET] get user list - sample
-router.get("/", async (req, res, next) => {
-  try {
-    // without service layer
-    const result = await User.findAll();
+router.put(
+  "/:userKey",
+  [
+    param("userKey").isNumeric(),
+    oneOf([
+      body("name").exists(),
+      body("password").exists(),
+      body("phoneNumber").exists(),
+      body("birth").exists(),
+    ]),
+    validatorErrorHanlder,
+  ],
+  jwtAuthenticator,
+  async (req, res, next) => {
+    try {
+      if (req.params.userKey != req.jwt.payload.key) {
+        throw {
+          name: "UnauthorizedAccessError",
+          message: "unauthorized access",
+        };
+      }
+      const result = await userService.modify(req.params.userKey, req.body);
 
-    const resBody = {
-      msg: "조회 결과",
-      result: result,
-    };
-
-    return res.status(200).json(resBody);
-  } catch (err) {
-    console.log(err);
-    return res.status(500).json({ msg: "ERROR MESSAGE" });
+      if (result == 1) {
+        res.status(200).json({ msg: "Modified", result: result });
+      } else {
+        res.status(404).json({ msg: `${req.params.userKey} does not exists` });
+      }
+      return res;
+    } catch (error) {
+      console.log(error);
+      if (error.name === "SequelizeDatabaseError") {
+        res.status(400).json({ msg: error });
+      } else if (error.name === "UnauthorizedAccessError") {
+        res.status(401).json({ msg: "Unauthorized" });
+      } else {
+        res.status(500).json({ msg: "Error" });
+      }
+      return res;
+    }
   }
-});
+);
 
 module.exports = router;
