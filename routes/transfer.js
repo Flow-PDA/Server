@@ -16,6 +16,7 @@ router.get("/:partyKey", async (req, res, next) => {
       result: transferList,
     });
   } catch (error) {
+    console.error(error);
     res.status(500).json({
       msg: "이체 내역 조회 실패",
     });
@@ -26,25 +27,28 @@ router.get("/:partyKey", async (req, res, next) => {
 router.post("/:partyKey", async (req, res, next) => {
   try {
     const { partyKey } = req.params;
-    const { userKey, name, accountNumber, price, transferType } = req.body;
+    const { userKey, name, accountNumber, price } = req.body;
+    const deposit = await Transfer.getPartyDeposit(partyKey);
 
     const transferDetailDto = {
       partyKey: partyKey,
       userKey: userKey,
       price: price,
-      transferType: transferType,
+      transferType: 1,
       accountNumber: accountNumber,
       name: name,
-      deposit: deposit, // 한투 api에서 예수금을 받아오는건지, 아니면 모임에서 참조한 deposit을 받아오는건지 ?
+      deposit: deposit - price,
+      // deposit: deposit - price, // 한투 api에서 예수금을 받아오는건지, 아니면 모임에서 참조한 deposit을 받아오는건지 ?
     };
 
-    const recentTransferList = await Transaction.transfer(transferDetailDto);
+    const recentTransferList = await Transfer.transfer(transferDetailDto);
 
     res.status(201).json({
       msg: "이체하기 성공",
       result: recentTransferList,
     });
   } catch (error) {
+    console.error(error);
     res.status(500).json({
       msg: "이체하기 실패",
     });
