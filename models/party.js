@@ -28,7 +28,7 @@ module.exports = (sequelize, Sequelize) => {
       },
       goalDate: {
         // DATE - DATETIME of MySQL
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
         allowNull: true,
       },
     },
