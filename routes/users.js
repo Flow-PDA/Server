@@ -106,10 +106,9 @@ router.post(
 );
 
 // [POST] logout
-router.post("/logout", async (req, res, next) => {
+router.post("/logout", jwtAuthenticator, async (req, res, next) => {
   try {
-    const token = req.headers.authorization;
-    const verified = await jwt.verify(token);
+    const verified = req.jwt.payload;
 
     console.log(verified.key);
 
