@@ -20,7 +20,7 @@ let config = {
     "content-type": "application/json",
     authorization: `Bearer ${TOKEN}`,
     appkey: `${APP_KEY}`,
-    appsecret:`${APP_SECRET}`,
+    appsecret: `${APP_SECRET}`,
     tr_id: `${TR_ID}`,
   },
   // data: data,
@@ -36,18 +36,28 @@ const User = db.Users;
 // service use
 const partyService = require("../services/partyService.js");
 
-// [Post] 모임 생성하기
+// [Post] 모임 생성하기 및 모임 멤버에 관리자 추가
 router.post("/", async (req, res, next) => {
   try {
-    // 모임 생성할 떄 자동으로 party_key 생기는지.
     const partyDto = {
       name: req.body.name,
       accountNumber: req.body.accountNumber,
     };
     const result = await Party.create(partyDto);
+
+    const memberDto = {
+      partyKey: result.partyKey,
+      userKey: 1000, //임시
+      role: 0, // 0일 때 관리자
+      isAccepted: true, //관리자는 무조건 수락이니까 true
+    };
+
+    const memberResult = await PartyMember.create(memberDto);
     const resBody = {
       msg: "모임 생성",
+      // new_msg: `관리자 ${userKey}`,
       result: result,
+      memberResuslt: memberResult,
     };
 
     return res.status(201).json(resBody);
@@ -90,13 +100,6 @@ router.get("/:partyKey", async (req, res, next) => {
     return res.status(500).json({ msg: "ERROR MESSAGE" });
   }
 });
-
-// axios.request(config)
-// .then((response) => {
-//   console.log(JSON.stringify(response.data));
-// })
-// .catch((error) => {
-//   console.log(error);
 
 // [PUT] 특정 모임 정보 설정하기
 router.put("/:partyKey/goals", async (req, res, next) => {
@@ -164,8 +167,6 @@ router.delete("/:partyKey", async (req, res, next) => {
   }
 });
 // [GET] 특정 모임에 속한 모임원들 조회
-// API 명세서에 없었는데 필요할 것 같아서 추가했습니다...
-//
 router.get("/:partyKey/members", async (req, res, next) => {
   try {
     const partyKey = req.params.partyKey;
@@ -183,14 +184,35 @@ router.get("/:partyKey/members", async (req, res, next) => {
     return res.status(500).json({ msg: "ERROR MESSAGE" });
   }
 });
+
+// [POST] 특정 모임에 일반 멤버 추가
+router.post("/:partyKey/members", async (req, res, next) => {
+  try {
+    const memberDto = {
+      userKey: 1003, //임시
+      partyKey: req.params.partyKey,
+      role: 1, // 일반 멤버
+      isAccepted: true,
+    };
+    const result = PartyMember.create(memberDto);
+
+    const resBody = {
+      msg: "멤버 추가",
+      result: result,
+    };
+    return res.status(201).json(resBody);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ msg: "ERROR MESSAGE" });
+  }
+});
 //[DELETE] 특정 모임원 내보내기
 router.delete("/:partyKey/members", async (req, res, next) => {
   try {
     const userKey = req.body.userKey;
-    const partyKey = req.params.partyKey;
 
-    const result = await PartyMember.delete({
-      where: { user_key: userKey, party_key: partyKey },
+    const result = await PartyMember.destroy({
+      where: { user_key: userKey, party_key: req.params.partyKey },
     });
     const resBody = {
       msg: "특정 모임원 삭제 결과",
