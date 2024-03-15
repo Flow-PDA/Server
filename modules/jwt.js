@@ -25,18 +25,27 @@ module.exports.sign = async (userKey, groups, name) => {
 };
 
 /**
- *
- * @param {*} token
- * @returns
+ * verify token
+ * @param {*} bearerToken token string with Bearer. Can be found at req.headers.authorization
+ * @returns key(userKey), name, iat, exp, groups(list of groups with role)
+ * @throws TokenExpiredError expired token
+ * @throws EmptyTokenError empty token
+ * @throws WrongTokenFormatError wrong token format, Not a Bearer token
+ * @trhows JsonWebTokenError invalid token
  */
-module.exports.verify = async (token) => {
-  try {
-    if (!token) throw { name: "EmptyTokenError", message: "Token is empty" };
-    const verified = jwt.verify(token, secretKey);
-
-    return verified;
-  } catch (error) {
-    console.log(error);
-    return null;
+module.exports.verify = async (bearerToken) => {
+  // console.log(bearerToken);
+  if (!bearerToken)
+    throw { name: "EmptyTokenError", message: "Token is empty" };
+  if (
+    !bearerToken.startsWith("Bearer ") ||
+    bearerToken.replace("Bearer ", "") == ""
+  ) {
+    throw { name: "WrongTokenFormatError", message: "Not a Bearer token" };
   }
+  const token = bearerToken.replace("Bearer ", "");
+
+  const verified = jwt.verify(token, secretKey);
+
+  return verified;
 };
