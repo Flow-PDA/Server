@@ -3,6 +3,8 @@ var router = express.Router();
 
 var usersRouter = require("./users");
 const interestStockRouter = require("./interestStock");
+var partiesRouter = require("./parties");
+var transfersRouter = require("./transfer");
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
@@ -11,5 +13,7 @@ router.get("/", function (req, res, next) {
 
 router.use("/users", usersRouter);
 router.use("/interests", interestStockRouter);
+router.use("/parties", partiesRouter);
+router.use("/transfers", transfersRouter);
 
 module.exports = router;

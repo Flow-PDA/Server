@@ -6,8 +6,10 @@ module.exports = (sequelize, Sequelize) => {
     {
       transferKey: {
         type: Sequelize.INTEGER.UNSIGNED,
+        autoIncrement: true,
         // composite PK
         primaryKey: true,
+        // defaultValue: 0,
       },
       partyKey: {
         type: Sequelize.INTEGER.UNSIGNED,

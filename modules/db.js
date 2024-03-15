@@ -9,7 +9,7 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   operatorsAliases: false,
 
   // logging
-  //logging: console.log,
+  // logging: console.log,
   // disable logging
   logging: false,
 

@@ -42,9 +42,6 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.INTEGER(1),
         defaultValue: 0,
       },
-      time: {
-        type: Sequelize.DATE,
-      },
     },
     {
       underscored: true,

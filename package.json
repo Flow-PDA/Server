@@ -9,6 +9,7 @@
     "db:import": "run-p db:import:*"
   },
   "dependencies": {
+    "axios": "^1.6.7",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "dotenv": "^16.4.5",
