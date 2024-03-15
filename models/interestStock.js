@@ -4,14 +4,17 @@ module.exports = (sequelize, Sequelize) => {
     // DB table name
     "interest_stock",
     {
+      interestStockKey: {
+        type: Sequelize.INTEGER.UNSIGNED,
+        autoIncrement: true,
+        primaryKey: true,
+      },
       stockKey: {
         type: Sequelize.STRING(6),
         references: {
           model: "stock",
           key: "stock_key",
         },
-        // composite PK
-        primaryKey: true,
       },
       partyKey: {
         type: Sequelize.INTEGER.UNSIGNED,
@@ -19,8 +22,6 @@ module.exports = (sequelize, Sequelize) => {
           model: "party",
           key: "party_key",
         },
-        // composite PK
-        primaryKey: true,
       },
       userKey: {
         type: Sequelize.INTEGER.UNSIGNED,

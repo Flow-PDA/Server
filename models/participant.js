@@ -4,34 +4,25 @@ module.exports = (sequelize, Sequelize) => {
     // DB table name
     "participant",
     {
-      userKey: {
+      participantKey: {
+        type: Sequelize.INTEGER.UNSIGNED,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      partyMemberKey: {
         type: Sequelize.INTEGER.UNSIGNED,
         references: {
-          model: "user",
-          key: "user_key",
+          model: "party_member",
+          key: "party_member_key",
         },
-        // composite PK
-        primaryKey: true,
       },
-      stockKey: {
-        type: Sequelize.STRING(6),
-        references: {
-          model: "interest_stock",
-          key: "stock_key",
-        },
-        // composite PK
-        primaryKey: true,
-      },
-      partyKey: {
-        type: Sequelize.INTEGER.UNSIGNED,
-        references: {
-          model: "interest_stock",
-          key: "party_key",
-        },
-        // composite PK
-        primaryKey: true,
-      },
-
+      interestStockKey : {
+        type : Sequelize.INTEGER.UNSIGNED,
+        references : {
+          model : "interest_stock",
+          key : "interest_stock_key"
+        }
+      }
       isApproved: {
         type: Sequelize.BOOLEAN,
       },
