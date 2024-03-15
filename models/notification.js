@@ -1,6 +1,6 @@
 module.exports = (sequelize, Sequelize) => {
   const Notification = sequelize.define(
-    "Notification",
+    "notification",
     {
       notificationKey: {
         type: Sequelize.INTEGER.UNSIGNED,
@@ -10,14 +10,14 @@ module.exports = (sequelize, Sequelize) => {
       userKey: {
         type: Sequelize.INTEGER.UNSIGNED,
         references: {
-          model: "User",
+          model: "user",
           key: "user_key",
         },
       },
       partyKey: {
         type: Sequelize.INTEGER.UNSIGNED,
         references: {
-          model: "Party",
+          model: "party",
           key: "party_key",
         },
       },
