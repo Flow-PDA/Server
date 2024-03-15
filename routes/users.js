@@ -1,7 +1,7 @@
 var express = require("express");
 var router = express.Router();
 // validator
-const { body } = require("express-validator");
+const { body, param } = require("express-validator");
 const { validatorErrorHanlder } = require("../middlewares/validator.js");
 
 // without service layer
@@ -42,6 +42,29 @@ router.post(
         res.status(500).json({ msg: "ERROR MESSAGE" });
       }
 
+      return res;
+    }
+  }
+);
+
+router.get(
+  "/check/:email",
+  [param("email").exists().isEmail(), validatorErrorHanlder],
+  async (req, res, next) => {
+    try {
+      const email = req.params.email;
+      const result = await userService.checkEmail(email);
+
+      if (result) {
+        res.status(200).json({ msg: "available" });
+      } else {
+        res.status(409).json({ msg: "exists" });
+      }
+
+      return res;
+    } catch (err) {
+      console.log(err);
+      res.status(500).send();
       return res;
     }
   }
