@@ -1,13 +1,14 @@
-var express = require('express');
+var express = require("express");
 var router = express.Router();
 
-var usersRouter = require('./users');
+var usersRouter = require("./users");
+var transfersRouter = require("./transfer");
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
-  res.status(200).json({msg: "Hello"})
+router.get("/", function (req, res, next) {
+  res.status(200).json({ msg: "Hello" });
 });
 
-router.use('/users', usersRouter);
-
+router.use("/users", usersRouter);
+router.use("/transfers", transfersRouter);
 module.exports = router;
