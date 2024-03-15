@@ -2,7 +2,7 @@ module.exports = (sequelize, Sequelize) => {
   // define model
   const Stock = sequelize.define(
     // DB table name
-    "Stock",
+    "stock",
     {
       stockKey: {
         type: Sequelize.STRING(6),

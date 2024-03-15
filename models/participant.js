@@ -2,12 +2,12 @@ module.exports = (sequelize, Sequelize) => {
   // define model
   const Participant = sequelize.define(
     // DB table name
-    "Participant",
+    "participant",
     {
       userKey: {
         type: Sequelize.INTEGER.UNSIGNED,
         references: {
-          model: "Party_Member",
+          model: "user",
           key: "user_key",
         },
         // composite PK
@@ -16,7 +16,7 @@ module.exports = (sequelize, Sequelize) => {
       stockKey: {
         type: Sequelize.STRING(6),
         references: {
-          model: "Interest_Stock",
+          model: "interest_stock",
           key: "stock_key",
         },
         // composite PK
@@ -25,7 +25,7 @@ module.exports = (sequelize, Sequelize) => {
       partyKey: {
         type: Sequelize.INTEGER.UNSIGNED,
         references: {
-          model: "Interest_Stock",
+          model: "interest_stock",
           key: "party_key",
         },
         // composite PK
