@@ -2,7 +2,7 @@ module.exports = (sequelize, Sequelize) => {
   // define model
   const User = sequelize.define(
     // DB table name
-    "User",
+    "user",
     {
       userKey: {
         type: Sequelize.INTEGER.UNSIGNED,
@@ -11,7 +11,7 @@ module.exports = (sequelize, Sequelize) => {
       },
       email: {
         type: Sequelize.STRING(30),
-        unique: true,
+        // unique: true,
       },
       phoneNumber: {
         type: Sequelize.STRING(15),
@@ -32,6 +32,7 @@ module.exports = (sequelize, Sequelize) => {
       underscored: true,
       freezeTableName: true,
       timeStamps: true, // default true
+      indexes: [{ unique: true, fields: ["email"] }],
     }
   );
 
