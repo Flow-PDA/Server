@@ -5,7 +5,7 @@ const { body, param } = require("express-validator");
 const { validatorErrorHanlder } = require("../middlewares/validator.js");
 
 // without service layer
-const { db } = require("../modules/");
+const { db, jwt } = require("../modules/");
 const User = db.Users;
 
 // with service layer
@@ -104,6 +104,32 @@ router.post(
     }
   }
 );
+
+// [POST] logout
+router.post("/logout", async (req, res, next) => {
+  try {
+    const token = req.headers.authorization;
+    const verified = await jwt.verify(token);
+
+    console.log(verified.key);
+
+    return res.status(200).json({ msg: "Done" });
+  } catch (error) {
+    if (
+      error.name === "JsonWebTokenError" ||
+      error.name === "WrongTokenFormatError" ||
+      error.name === "EmptyTokenError"
+    ) {
+      res.status(400).json({ msg: "invalid token" });
+    } else if (error.name === "TokenExpiredError") {
+      res.status(401).json({ msg: "Unauthorized" });
+    } else {
+      res.status(500).json({ msg: error });
+    }
+
+    return res;
+  }
+});
 
 // [GET] get user list - sample
 router.get("/", async (req, res, next) => {
