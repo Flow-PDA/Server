@@ -4,7 +4,7 @@ const InterestStock = db.InterestStocks;
 const Stock = db.Stocks;
 const User = db.Users;
 const Party = db.Parties;
-const PartyMember = db.Parties;
+const PartyMember = db.PartyMembers;
 const Participant = db.Participants;
 
 /**
@@ -34,49 +34,23 @@ module.exports.vote = async (interestStockDto) => {
     const { stockKey, userKey, partyKey, isApproved } = interestStockDto;
 
     let voteParticipant;
-    //투표한 사람이 찬성을 누른 경우
-    if (isApproved) {
-      voteParticipant = await Participant.findOne({
-        where: { party_key: partyKey, stock_key: stockKey, user_key: userKey },
-      });
+    voteParticipant = await Participant.findOne({
+      where: { partyKey: partyKey, stockKey: stockKey, userKey: userKey },
+    });
 
-      //이미 투표를 했었으면
-      if (voteParticipant) {
-        //Participant
-        await voteParticipant.update({ is_approved: true });
-      }
+    if (voteParticipant !== null) {
+      // Participant 레코드 업데이트
 
-      //투표를 처음하는 거면
-      else {
-        voteParticipant = await Participant.create({
-          stockKey: stockKey,
-          userKey: userKey,
-          partyKey: partyKey,
-          is_approved: true,
-        });
-      }
+      await voteParticipant.update({ isApproved: isApproved });
+      await voteParticipant.save();
     } else {
-      //투표한 사람이 반대를 누른 경우
-      voteParticipant = await Participant.findOne({
-        where: { party_key: partyKey, stock_key: stockKey, user_key: userKey },
+      // 투표를 처음하는 경우 새로운 Participant 레코드 생성
+      voteParticipant = await Participant.create({
+        stockKey: stockKey,
+        userKey: userKey,
+        partyKey: partyKey,
+        isApproved: isApproved,
       });
-
-      //이미 투표를 했었으면
-      if (voteParticipant) {
-        //업데이트
-        await voteParticipant.update({ is_approved: false });
-      }
-
-      //투표를 처음하는 거면
-      else {
-        //투표 참여자 만들어주기
-        voteParticipant = await Participant.create({
-          stockKey: stockKey,
-          userKey: userKey,
-          partyKey: partyKey,
-          is_approved: false,
-        });
-      }
     }
 
     return voteParticipant;
@@ -85,26 +59,48 @@ module.exports.vote = async (interestStockDto) => {
   }
 };
 
-// module.exports.changeApprovalResult = async (interestStockDto) => {
-//   try {
-//     const { stockKey, userKey, partyKey, isApproved } = interestStockDto;
+module.exports.changeApprovalResult = async (interestStockDto) => {
+  try {
+    const { stockKey, userKey, partyKey, isApproved } = interestStockDto;
 
-//     const partyMemberCnt=   await Party_.findOne({
-//       where: { party_key: partyKey, stock_key: stockKey, user_key: userKey },
-//     });
+    //모임멤버 수
+    const partyMemberCnt = await PartyMember.count({
+      where: { partyKey: partyKey },
+    });
 
-//     //투표 참여자 전원이 찬성하면 관심 주식이 승인 완료로 바뀌어야함
-//     if()
+    console.log(partyMemberCnt);
 
-//   } catch (error) {
-//     throw error;
-//   }
-// };
+    //찬성한 참여자 수
+    const participantApprovalCnt = await Participant.count({
+      where: {
+        partyKey: partyKey,
+        stockKey: stockKey,
+        isApproved: true,
+      },
+    });
+    console.log(participantApprovalCnt);
+
+    if (partyMemberCnt === participantApprovalCnt) {
+      // 투표 참여자 전원이 찬성한 경우
+      // 관련된 주식을 찾아서 승인 상태를 변경합니다.
+      await InterestStock.update(
+        { isApproved: true },
+        {
+          where: { stockKey: stockKey, partyKey: partyKey },
+        }
+      );
+    }
+
+    return InterestStock;
+  } catch (error) {
+    throw error;
+  }
+};
 
 module.exports.getApproval = async (partyKey) => {
   try {
     const interestStock = await InterestStock.findAll({
-      where: { party_key: partyKey, is_approved: false },
+      where: { partyKey: partyKey, isApproved: false },
     });
 
     if (!interestStock) {
@@ -120,7 +116,7 @@ module.exports.getApproval = async (partyKey) => {
 module.exports.getApproved = async (partyKey) => {
   try {
     const interestStock = await InterestStock.findAll({
-      where: { party_key: partyKey, is_approved: true },
+      where: { partyKey: partyKey, isApproved: true },
     });
 
     if (!interestStock) {
@@ -133,19 +129,21 @@ module.exports.getApproved = async (partyKey) => {
   }
 };
 
-module.exports.delApproved = async ({ partyKey, stockKey }) => {
-  try {
-    const interestStock = await InterestStock.destroy({
-      where: { party_key: partyKey, stock_key: stockKey },
-    });
+// module.exports.delApproved = async ({ partyKey, stockKey }) => {
+//   try {
+//     // 해당 partyKey와 stockKey를 가진 모든 Participant 레코드 삭제
+//     await Participant.destroy({
+//       where: { partyKey: partyKey, stockKey: stockKey },
+//     });
 
-    if (!interestStock) {
-      throw new Error("interestStock not found");
-    }
+//     // InterestStock 테이블의 해당 행 삭제
+//     const interestStock = await InterestStock.destroy({
+//       where: { partyKey: partyKey, stockKey: stockKey },
+//     });
 
-    //나중에 문제 없으면 삭제 필요
-    return { partyKey, stockKey };
-  } catch (error) {
-    throw error;
-  }
-};
+//     //나중에 문제 없으면 삭제 필요
+//     return { partyKey, stockKey };
+//   } catch (error) {
+//     throw error;
+//   }
+// };

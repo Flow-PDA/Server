@@ -33,8 +33,13 @@ router.post("/:partyKey/:stockKey", async (req, res, next) => {
     const interestStockDto = { ...req.body, partyKey, stockKey };
 
     // using service layer
-    const result = await interestStockService.vote(interestStockDto);
-    await interestStockService.changeApprovalResult(interestStockDto);
+    await interestStockService.vote(interestStockDto);
+
+    const result = await interestStockService.changeApprovalResult(
+      interestStockDto
+    );
+
+    console.log(result);
 
     const resBody = {
       msg: "찜 목록 투표",
@@ -105,7 +110,7 @@ router.delete("/:partyKey/:stockKey", async (req, res, next) => {
     console.log(err);
     return res
       .status(500)
-      .json({ msg: "ERROR MESSAGE: 삭제할 관심 주식 존재하지 않음" });
+      .json({ msg: "ERROR MESSAGE: 관심주식 삭제하는데서 오류" });
   }
 });
 
