@@ -30,7 +30,7 @@ db.sequelize = sequelize;
 // model
 db.Users = require("../models/user.js")(sequelize, Sequelize);
 db.Parties = require("../models/party.js")(sequelize, Sequelize);
-db.PartieMembers = require("../models/partyMember.js")(sequelize, Sequelize);
+db.PartyMembers = require("../models/partyMember.js")(sequelize, Sequelize);
 db.Notifications = require("../models/notification.js")(sequelize, Sequelize);
 db.TransactionDetails = require("../models/transactionDetail.js")(sequelize, Sequelize);
 db.Stocks = require("../models/stock.js")(sequelize, Sequelize);
