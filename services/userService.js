@@ -1,5 +1,5 @@
 // controllers/tutorial.controller.js
-const { db } = require("../modules");
+const { db, jwt } = require("../modules");
 const User = db.Users;
 
 /**
@@ -28,4 +28,36 @@ module.exports.checkEmail = async (email) => {
   });
 
   return res === null ? true : false;
+};
+
+/**
+ * login
+ * @param {*} loginDto email, password
+ * @returns user info with access & refresh token
+ * @throws IncorrectPasswordError
+ */
+module.exports.login = async (loginDto) => {
+  const user = await User.findOne({
+    where: {
+      email: loginDto.email,
+    },
+  });
+
+  if (!user || user.password !== loginDto.password) {
+    throw { name: "IncorrectPasswordError", message: "Incorrect password" };
+  }
+
+  // TODO: get group list and role
+  const groupList = [];
+
+  // create token
+  const tokens = await jwt.sign(user.userKey, groupList, user.name);
+
+  return {
+    name: user.name,
+    userKey: user.userKey,
+    birth: user.birth,
+    phoneNumber: user.phoneNumber,
+    ...tokens,
+  };
 };

@@ -70,6 +70,36 @@ router.get(
   }
 );
 
+// [POST] login
+router.post(
+  "/login",
+  [
+    body("email").exists().isEmail(),
+    body("password").exists(),
+    validatorErrorHanlder,
+  ],
+  async (req, res, next) => {
+    try {
+      const loginDto = {
+        email: req.body.email,
+        password: req.body.password,
+      };
+
+      const result = await userService.login(loginDto);
+
+      return res.status(200).json(result);
+    } catch (error) {
+      if (error.name === "IncorrectPasswordError") {
+        res.status(401).json({ msg: "Unauthorized" });
+      } else {
+        res.status(500).json({ msg: error });
+      }
+
+      return res;
+    }
+  }
+);
+
 // [GET] get user list - sample
 router.get("/", async (req, res, next) => {
   try {
