@@ -1,8 +1,7 @@
 // controllers/tutorial.controller.js
-const transferDetail = require("../models/transferDetail");
 const { db } = require("../modules");
-const { Users } = db.Users;
 const TransferDetails = db.TransferDetails;
+const Parties = db.Parties;
 
 /**
  * create transfer
@@ -24,13 +23,15 @@ module.exports.transfer = async (TransferDetailDto) => {
   return res;
 };
 
-//이체할때 유저 찾는 함수
-module.exports.getUser = async (userKey) => {
-  const user = await Users.findOne({
-    userKey: userKey,
+//이체할때 파티 찾는 함수
+module.exports.getPartyDeposit = async (partyKey) => {
+  const party = await Parties.findOne({
+    where: {
+      partyKey: partyKey,
+    },
   });
 
-  return user;
+  return party.dataValues.deposit;
 };
 
 //이체 내역 10개 조회
@@ -41,7 +42,7 @@ module.exports.getTransferList = async (partyKey) => {
         partyKey: partyKey,
       },
       limit: 10,
-      order: ["time", "DESC"],
+      order: [["createdAt", "DESC"]],
     });
 
     if (!transferDetails || transferDetails.length === 0) {
@@ -71,7 +72,7 @@ module.exports.getRecentTransferList = async (partyKey) => {
         transferType: 1, // 0:입금 1:출금
       },
       limit: 4,
-      order: ["time", "DESC"],
+      order: [["createdAt", "DESC"]],
     });
 
     if (!transferDetails || transferDetails.length === 0) {

@@ -9,9 +9,9 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   operatorsAliases: false,
 
   // logging
-  logging: console.log,
+  // logging: console.log,
   // disable logging
-  // logging: false,
+  logging: false,
 
   // connection pool
   pool: {
@@ -32,7 +32,10 @@ db.Users = require("../models/user.js")(sequelize, Sequelize);
 db.Parties = require("../models/party.js")(sequelize, Sequelize);
 db.PartyMembers = require("../models/partyMember.js")(sequelize, Sequelize);
 db.Notifications = require("../models/notification.js")(sequelize, Sequelize);
-db.TransactionDetails = require("../models/transactionDetail.js")(sequelize, Sequelize);
+db.TransactionDetails = require("../models/transactionDetail.js")(
+  sequelize,
+  Sequelize
+);
 db.Stocks = require("../models/stock.js")(sequelize, Sequelize);
 db.InterestStocks = require("../models/interestStock.js")(sequelize, Sequelize);
 db.Participants = require("../models/participant.js")(sequelize, Sequelize);
