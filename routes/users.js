@@ -87,7 +87,12 @@ router.post(
 
       const result = await userService.login(loginDto);
 
-      return res.status(200).json(result);
+      const resBody = {
+        msg: "Success",
+        result: result,
+      };
+
+      return res.status(200).json(resBody);
     } catch (error) {
       if (error.name === "IncorrectPasswordError") {
         res.status(401).json({ msg: "Unauthorized" });

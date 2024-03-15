@@ -33,7 +33,7 @@ module.exports.checkEmail = async (email) => {
 /**
  * login
  * @param {*} loginDto email, password
- * @returns user info with access & refresh token
+ * @returns {Promise<*>} user info with access & refresh token
  * @throws IncorrectPasswordError
  */
 module.exports.login = async (loginDto) => {
