@@ -1,5 +1,8 @@
 var express = require("express");
 var router = express.Router();
+// validator
+const { body } = require("express-validator");
+const { validatorErrorHanlder } = require("../middlewares/validator.js");
 
 // without service layer
 const { db } = require("../modules/");
@@ -9,28 +12,40 @@ const User = db.Users;
 const userService = require("../services/userService.js");
 
 // [POST] signup
-router.post("/signup", async (req, res, next) => {
-  try {
-    const userDto = req.body;
+router.post(
+  "/signup",
+  [
+    body("email").exists().isEmail(),
+    body("name").exists().isLength({ max: 10 }),
+    body("password").exists(),
+    body("phoneNumber").exists(),
+    body("birth").exists(),
+    validatorErrorHanlder,
+  ],
+  async (req, res, next) => {
+    try {
+      const userDto = req.body;
 
-    // using service layer
-    // const result = await userService.signup(userDto);
+      // using service layer
+      const result = await userService.signup(userDto);
 
-    // without service layer
-    const result = await User.create(userDto);
+      // console.log(result);
+      const resBody = {
+        msg: "Created",
+      };
 
-    const resBody = {
-      msg: "Created",
-      result: result,
-    };
+      return res.status(201).json(resBody);
+    } catch (err) {
+      if (err.name === "SequelizeUniqueConstraintError") {
+        res.status(409).json({ msg: "Email already exists" });
+      } else {
+        res.status(500).json({ msg: "ERROR MESSAGE" });
+      }
 
-    return res.status(201).json(resBody);
-  } catch (err) {
-    // error handling
-    console.log(err);
-    return res.status(500).json({ msg: "ERROR MESSAGE" });
+      return res;
+    }
   }
-});
+);
 
 // [GET] get user list - sample
 router.get("/", async (req, res, next) => {
