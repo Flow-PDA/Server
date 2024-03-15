@@ -1,12 +1,12 @@
 module.exports = (sequelize, Sequelize) => {
   // define model
   const PartyMember = sequelize.define(
-    "Party_Member",
+    "party_member",
     {
       userKey: {
         type: Sequelize.INTEGER.UNSIGNED,
         references: {
-          model: "User",
+          model: "user",
           key: "user_key",
         },
         // composite PK
@@ -15,7 +15,7 @@ module.exports = (sequelize, Sequelize) => {
       partyKey: {
         type: Sequelize.INTEGER.UNSIGNED,
         references: {
-          model: "Party",
+          model: "party",
           key: "party_key",
         },
         // composite PK
