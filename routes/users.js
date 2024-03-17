@@ -91,7 +91,9 @@ router.post(
 
       return res.status(200).json(resBody);
     } catch (error) {
-      if (error.name === "IncorrectPasswordError") {
+      if (error.name === "IncorrectEmailError") {
+        res.status(404).json({ msg: "Incorrect Email" });
+      } else if (error.name === "IncorrectPasswordError") {
         res.status(401).json({ msg: "Unauthorized" });
       } else {
         res.status(500).json({ msg: error });

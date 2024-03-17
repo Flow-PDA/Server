@@ -1,6 +1,7 @@
 // controllers/tutorial.controller.js
 const { db, jwt } = require("../modules");
 const User = db.Users;
+const bcrypt = require("bcrypt");
 
 /**
  * create user
@@ -10,6 +11,10 @@ const User = db.Users;
  */
 module.exports.signup = async (userDto) => {
   // console.log(userDto);
+  const salt = await bcrypt.genSalt();
+  const hashedPassword = await bcrypt.hash(userDto.password, salt);
+
+  userDto.password = hashedPassword;
   const res = await User.create(userDto);
   // console.log(res);
   return res.dataValues;
@@ -34,6 +39,7 @@ module.exports.checkEmail = async (email) => {
  * login
  * @param {*} loginDto email, password
  * @returns {Promise<*>} user info with access & refresh token
+ * @throws IncorrectEmailError
  * @throws IncorrectPasswordError
  */
 module.exports.login = async (loginDto) => {
@@ -43,7 +49,11 @@ module.exports.login = async (loginDto) => {
     },
   });
 
-  if (!user || user.password !== loginDto.password) {
+  if (!user) {
+    throw { name: "IncorrectEmailError", message: "Incorrect email" };
+  }
+  const comparePassword = await bcrypt.compare(loginDto.password, user.password);
+  if (!comparePassword) {
     throw { name: "IncorrectPasswordError", message: "Incorrect password" };
   }
 
@@ -70,6 +80,12 @@ module.exports.login = async (loginDto) => {
  * @throws SequelizeDatabaseError invalid input
  */
 module.exports.modify = async (userKey, modifyUserDto) => {
+  if (modifyUserDto.password) {
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(modifyUserDto.password, salt);
+
+    modifyUserDto.password = hashedPassword;
+  }
   const result = await User.update(
     { ...modifyUserDto },
     { where: { userKey: userKey } }
