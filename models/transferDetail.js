@@ -2,24 +2,26 @@ module.exports = (sequelize, Sequelize) => {
   // define model
   const TransferDetail = sequelize.define(
     // DB table name
-    "Transfer_Detail",
+    "transfer_detail",
     {
       transferKey: {
         type: Sequelize.INTEGER.UNSIGNED,
+        autoIncrement: true,
         // composite PK
         primaryKey: true,
+        // defaultValue: 0,
       },
       partyKey: {
         type: Sequelize.INTEGER.UNSIGNED,
         references: {
-          model: "Party",
+          model: "party",
           key: "party_key",
         },
       },
       userKey: {
         type: Sequelize.INTEGER.UNSIGNED,
         references: {
-          model: "User",
+          model: "user",
           key: "user_key",
         },
       },

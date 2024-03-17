@@ -2,7 +2,7 @@ module.exports = (sequelize, Sequelize) => {
   //define model
   const TransactionDetail = sequelize.define(
     //DB table name
-    "Transaction_Detail",
+    "transaction_detail",
     {
       transactionKey: {
         type: Sequelize.INTEGER.UNSIGNED,
@@ -12,21 +12,21 @@ module.exports = (sequelize, Sequelize) => {
       userKey: {
         type: Sequelize.INTEGER.UNSIGNED,
         references: {
-          model: "User",
+          model: "user",
           key: "user_key",
         },
       },
       partyKey: {
         type: Sequelize.INTEGER.UNSIGNED,
         references: {
-          model: "Party",
+          model: "party",
           key: "party_key",
         },
       },
       stockKey: {
         type: Sequelize.STRING(6),
         references: {
-          model: "Stock",
+          model: "stock",
           key: "stock_key",
         },
       },
@@ -41,9 +41,6 @@ module.exports = (sequelize, Sequelize) => {
       transactionType: {
         type: Sequelize.INTEGER(1),
         defaultValue: 0,
-      },
-      time: {
-        type: Sequelize.DATE,
       },
     },
     {

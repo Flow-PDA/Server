@@ -1,25 +1,26 @@
 module.exports = (sequelize, Sequelize) => {
   // define model
   const PartyMember = sequelize.define(
-    "Party_Member",
+    "party_member",
     {
+      partyMemberKey: {
+        type: Sequelize.INTEGER.UNSIGNED,
+        autoIncrement: true,
+        primaryKey: true,
+      },
       userKey: {
         type: Sequelize.INTEGER.UNSIGNED,
         references: {
-          model: "User",
+          model: "user",
           key: "user_key",
         },
-        // composite PK
-        primaryKey: true,
       },
       partyKey: {
         type: Sequelize.INTEGER.UNSIGNED,
         references: {
-          model: "Party",
+          model: "party",
           key: "party_key",
         },
-        // composite PK
-        primaryKey: true,
       },
       role: {
         // 0 for member, 1 for owner

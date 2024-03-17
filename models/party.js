@@ -2,7 +2,7 @@ module.exports = (sequelize, Sequelize) => {
   // define model
   const Party = sequelize.define(
     // DB table name
-    "Party",
+    "party",
     {
       partyKey: {
         type: Sequelize.INTEGER.UNSIGNED,
@@ -28,7 +28,7 @@ module.exports = (sequelize, Sequelize) => {
       },
       goalDate: {
         // DATE - DATETIME of MySQL
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
         allowNull: true,
       },
     },
