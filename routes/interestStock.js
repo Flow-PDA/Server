@@ -26,13 +26,12 @@ router.post("/", async (req, res, next) => {
 });
 
 // [POST] 투표
-router.post("/:partyKey/:stockKey", async (req, res, next) => {
+router.post("/:interestStockKey", async (req, res, next) => {
   try {
-    const partyKey = req.params.partyKey;
-    const stockKey = req.params.stockKey;
-    const interestStockDto = { ...req.body, partyKey, stockKey };
+    const interestStockKey = req.params.interestStockKey;
 
-    // using service layer
+    const interestStockDto = { ...req.body, interestStockKey };
+
     await interestStockService.vote(interestStockDto);
 
     const result = await interestStockService.changeApprovalResult(
@@ -91,14 +90,11 @@ router.get("/:partyKey/approved", async (req, res, next) => {
 });
 
 // [DELETE] 승인된 list 빼기
-router.delete("/:partyKey/:stockKey", async (req, res, next) => {
+router.delete("/:interestStockKey", async (req, res, next) => {
   try {
-    const partyKey = req.params.partyKey;
-    const stockKey = req.params.stockKey;
-    const result = await interestStockService.delApproved({
-      partyKey,
-      stockKey,
-    });
+    const interestStockKey = req.params.interestStockKey;
+
+    const result = await interestStockService.delApproved(interestStockKey);
 
     const resBody = {
       msg: "승인된 종목 삭제",

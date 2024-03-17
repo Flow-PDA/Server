@@ -16,13 +16,13 @@ module.exports = (sequelize, Sequelize) => {
           key: "party_member_key",
         },
       },
-      interestStockKey : {
-        type : Sequelize.INTEGER.UNSIGNED,
-        references : {
-          model : "interest_stock",
-          key : "interest_stock_key"
-        }
-      }
+      interestStockKey: {
+        type: Sequelize.INTEGER.UNSIGNED,
+        references: {
+          model: "interest_stock",
+          key: "interest_stock_key",
+        },
+      },
       isApproved: {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
