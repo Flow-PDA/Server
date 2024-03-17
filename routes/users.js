@@ -173,4 +173,34 @@ router.put(
   }
 );
 
+// [DELETE] leave
+router.delete("/:userKey", [param("userKey").isNumeric(), validatorErrorHanlder], jwtAuthenticator, async (req, res, next) => {
+  try {
+    const userKey = req.params.userKey;
+    if (userKey != req.jwt.payload.key) {
+      throw {
+        name: "UnauthorizedAccessError",
+        message: "unauthorized access",
+      };
+    }
+    const result = await userService.delete(userKey);
+
+    if (result == 1) {
+      res.status(200).json({ msg: result });
+    } else {
+      res.status(404).json({ msg: `${userKey} user does not exists` });
+    }
+    return res;
+  } catch (error) {
+    if (error.name === "UnauthorizedAccessError") {
+      res.status(401).json({ msg: "Unauthorized" });
+    }
+    else {
+      console.log(error);
+      res.status(500).json({ msg: "Error" });
+    }
+    return res;
+  }
+})
+
 module.exports = router;

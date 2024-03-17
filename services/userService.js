@@ -79,3 +79,15 @@ module.exports.modify = async (userKey, modifyUserDto) => {
 
   return result;
 };
+
+/**
+ * delete user
+ * @param {*} userKey user identifier
+ * @returns number of modified row
+ */
+module.exports.delete = async (userKey) => {
+  const result = await User.destroy({ where: { userKey: userKey } });
+
+  console.log(result);
+  return result;
+}
