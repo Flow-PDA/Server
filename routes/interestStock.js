@@ -4,7 +4,7 @@ var router = express.Router();
 // with service layer
 const interestStockService = require("../services/interestStockService.js");
 
-// [POST] 찜 목록 등록
+// [POST] 관심 목록 등록
 router.post("/", async (req, res, next) => {
   try {
     const interestStockDto = req.body;
@@ -13,15 +13,15 @@ router.post("/", async (req, res, next) => {
     const result = await interestStockService.register(interestStockDto);
 
     const resBody = {
-      msg: "찜 목록 등록",
-      result: result,
+      msg: "관심 목록 등록",
+      result: {},
     };
 
     return res.status(201).json(resBody);
   } catch (err) {
     // error handling
     console.log(err);
-    return res.status(500).json({ msg: "ERROR MESSAGE" });
+    return res.status(500).json({ msg: "ERROR MESSAGE: 관심 목록 등록 오류" });
   }
 });
 
@@ -34,44 +34,42 @@ router.post("/:interestStockKey", async (req, res, next) => {
 
     await interestStockService.vote(interestStockDto);
 
-    const result = await interestStockService.changeApprovalResult(
-      interestStockDto
-    );
-
-    console.log(result);
+    await interestStockService.changeApprovalResult(interestStockDto);
 
     const resBody = {
-      msg: "찜 목록 투표",
-      result: result,
+      msg: "관심 목록 투표",
+      result: {},
     };
 
     return res.status(201).json(resBody);
   } catch (err) {
     // error handling
     console.log(err);
-    return res.status(500).json({ msg: "ERROR MESSAGE" });
+    return res.status(500).json({ msg: "ERROR MESSAGE: 관심 목록 투표 오류" });
   }
 });
 
-// [GET] get 승인 중인 list
+// [GET] get 승인 중인 관심 list
 router.get("/:partyKey/approval", async (req, res, next) => {
   try {
     const partyKey = req.params.partyKey;
     const result = await interestStockService.getApproval(partyKey);
 
     const resBody = {
-      msg: "승인 중인 리스트 조회",
+      msg: "승인 중인 관심 리스트 조회",
       result: result,
     };
 
     return res.status(200).json(resBody);
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ msg: "ERROR MESSAGE" });
+    return res
+      .status(500)
+      .json({ msg: "ERROR MESSAGE: 승인 중인 관심 리스트 get 오류" });
   }
 });
 
-// [GET] get 승인된 list
+// [GET] get 승인된 관심 list
 router.get("/:partyKey/approved", async (req, res, next) => {
   try {
     const partyKey = req.params.partyKey;
@@ -85,20 +83,22 @@ router.get("/:partyKey/approved", async (req, res, next) => {
     return res.status(200).json(resBody);
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ msg: "ERROR MESSAGE" });
+    return res
+      .status(500)
+      .json({ msg: "ERROR MESSAGE: 승인된 관심 리스트 get 오류" });
   }
 });
 
-// [DELETE] 승인된 list 빼기
+// [DELETE] 승인된 관심 종목 빼기
 router.delete("/:interestStockKey", async (req, res, next) => {
   try {
     const interestStockKey = req.params.interestStockKey;
 
-    const result = await interestStockService.delApproved(interestStockKey);
+    await interestStockService.delApproved(interestStockKey);
 
     const resBody = {
-      msg: "승인된 종목 삭제",
-      result: result,
+      msg: "승인된 관심 종목 삭제",
+      result: {},
     };
 
     return res.status(200).json(resBody);
@@ -106,7 +106,7 @@ router.delete("/:interestStockKey", async (req, res, next) => {
     console.log(err);
     return res
       .status(500)
-      .json({ msg: "ERROR MESSAGE: 관심주식 삭제하는데서 오류" });
+      .json({ msg: "ERROR MESSAGE: 승인된 관심주식 del 오류" });
   }
 });
 
