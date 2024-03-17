@@ -2,6 +2,7 @@ var express = require("express");
 var router = express.Router();
 const axios = require("axios");
 const dotenv = require("dotenv");
+const { jwtAuthenticator } = require("../middlewares/authenticator.js");
 dotenv.config();
 
 const APP_KEY = process.env.APP_KEY;
@@ -37,8 +38,9 @@ const User = db.Users;
 const partyService = require("../services/partyService.js");
 
 // [Post] 모임 생성하기 및 모임 멤버에 관리자 추가
-router.post("/", async (req, res, next) => {
+router.post("/", jwtAuthenticator, async (req, res, next) => {
   try {
+    const userKey = req.jwt.payload.key;
     const partyDto = {
       name: req.body.name,
       accountNumber: req.body.accountNumber,
@@ -47,8 +49,8 @@ router.post("/", async (req, res, next) => {
 
     const memberDto = {
       partyKey: result.partyKey,
-      userKey: 1000, //임시
-      role: 0, // 0일 때 관리자
+      userKey: userKey, //임시
+      role: 1, // 1일 때 관리자
       isAccepted: true, //관리자는 무조건 수락이니까 true
     };
 
@@ -66,10 +68,13 @@ router.post("/", async (req, res, next) => {
     return res.status(500).json({ msg: "ERROR MESSAGE" });
   }
 });
-
+// Groups 추가!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // [GET] 모임 조회하기
-router.get("/", async (req, res, next) => {
+router.get("/", jwtAuthenticator, async (req, res, next) => {
   try {
+    const value = req.jwt.payload;
+    // 이부분에 jwt.payload에서 가입한 group 나옴,//
+    console.log("a:", value);
     const result = await Party.findAll();
     const resBody = {
       msg: "모임 조회 결과",
@@ -186,19 +191,20 @@ router.get("/:partyKey/members", async (req, res, next) => {
 });
 
 // [POST] 특정 모임에 일반 멤버 추가
-router.post("/:partyKey/members", async (req, res, next) => {
+router.post("/:partyKey/members", jwtAuthenticator, async (req, res, next) => {
   try {
+    const userKey = req.jwt.payload.key
     const memberDto = {
-      userKey: 1003, //임시
+      userKey: userKey, //임시
       partyKey: req.params.partyKey,
-      role: 1, // 일반 멤버
+      role: 0, // 일반 멤버
       isAccepted: true,
     };
     const result = PartyMember.create(memberDto);
 
     const resBody = {
       msg: "멤버 추가",
-      result: result,
+      result: `${userKey}가 추가되었습니다.`,
     };
     return res.status(201).json(resBody);
   } catch (err) {
