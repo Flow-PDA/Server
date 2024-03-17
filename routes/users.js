@@ -5,9 +5,6 @@ const { body, param, oneOf } = require("express-validator");
 const { validatorErrorHanlder } = require("../middlewares/validator.js");
 const { jwtAuthenticator } = require("../middlewares/authenticator.js");
 
-// without service layer
-const { jwt } = require("../modules/");
-
 // with service layer
 const userService = require("../services/userService.js");
 
@@ -35,11 +32,11 @@ router.post(
       };
 
       return res.status(201).json(resBody);
-    } catch (err) {
-      if (err.name === "SequelizeUniqueConstraintError") {
+    } catch (error) {
+      if (error.name === "SequelizeUniqueConstraintError") {
         res.status(409).json({ msg: "Email already exists" });
       } else {
-        res.status(500).json({ msg: "ERROR MESSAGE" });
+        res.status(500).json({ msg: error.name });
       }
 
       return res;
@@ -58,13 +55,13 @@ router.get(
       if (result) {
         res.status(200).json({ msg: "available" });
       } else {
-        res.status(409).json({ msg: "exists" });
+        res.status(409).json({ msg: "email already exists" });
       }
 
       return res;
-    } catch (err) {
-      console.log(err);
-      res.status(500).send();
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ msg: error.name });
       return res;
     }
   }
@@ -130,6 +127,7 @@ router.post("/logout", jwtAuthenticator, async (req, res, next) => {
   }
 });
 
+// [PUT] modify user info
 router.put(
   "/:userKey",
   [
@@ -192,11 +190,11 @@ router.delete("/:userKey", [param("userKey").isNumeric(), validatorErrorHanlder]
     }
     return res;
   } catch (error) {
+    console.log(error);
     if (error.name === "UnauthorizedAccessError") {
       res.status(401).json({ msg: "Unauthorized" });
     }
     else {
-      console.log(error);
       res.status(500).json({ msg: "Error" });
     }
     return res;
