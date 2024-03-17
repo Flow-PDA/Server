@@ -22,7 +22,7 @@ module.exports = (sequelize, Sequelize) => {
           model : "interest_stock",
           key : "interest_stock_key"
         }
-      }
+      },
       isApproved: {
         type: Sequelize.BOOLEAN,
       },
