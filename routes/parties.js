@@ -230,4 +230,13 @@ router.delete("/:partyKey/members", async (req, res, next) => {
     return res.status(500).json({ msg: "ERROR MESSAGE" });
   }
 });
+
+//모임원 초대링크 보내기
+router.post("/:partyKey/invite", async (req, res, next) => {
+  try {
+  } catch (error) {
+    console.error(error);
+    throw new Error(error);
+  }
+});
 module.exports = router;
