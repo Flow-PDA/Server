@@ -4,10 +4,19 @@ var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 const { db } = require("./modules");
+const cors = require("cors");
 
 var indexRouter = require("./routes/index");
 
 var app = express();
+
+// CORS 설정, 클라이언트 HOST와 맞추어야 함
+app.use(
+  cors({
+    origin: ["http://localhost:5173", "http://localhost:3000"],
+    credentials: true,
+  })
+);
 
 /**
  * db sync mode

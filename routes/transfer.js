@@ -1,6 +1,6 @@
 var express = require("express");
 var router = express.Router();
-
+const { jwtAuthenticator } = require("../middlewares/authenticator.js");
 const Transfer = require("../services/transferService.js");
 //partyKey, userKey, price, transferType, time, accountNumber, name, deposit art required
 
@@ -24,15 +24,15 @@ router.get("/:partyKey", async (req, res, next) => {
 });
 
 //이체 /transfers/:partyKey
-router.post("/:partyKey", async (req, res, next) => {
+router.post("/:partyKey", jwtAuthenticator, async (req, res, next) => {
   try {
     const { partyKey } = req.params;
-    const { userKey, name, accountNumber, price } = req.body;
+    const { name, accountNumber, price } = req.body;
     const deposit = await Transfer.getPartyDeposit(partyKey);
 
     const transferDetailDto = {
       partyKey: partyKey,
-      userKey: userKey,
+      userKey: req.jwt.payload.key,
       price: price,
       transferType: 1,
       accountNumber: accountNumber,
@@ -40,6 +40,8 @@ router.post("/:partyKey", async (req, res, next) => {
       deposit: deposit - price,
       // deposit: deposit - price, // 한투 api에서 예수금을 받아오는건지, 아니면 모임에서 참조한 deposit을 받아오는건지 ?
     };
+
+    console.log(transferDetailDto);
 
     const recentTransferList = await Transfer.transfer(transferDetailDto);
 
