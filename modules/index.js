@@ -1,3 +1,3 @@
 const db = require("./db.js");
-
-module.exports = { db };
+const jwt = require("./jwt.js");
+module.exports = { db, jwt };

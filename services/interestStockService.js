@@ -16,9 +16,10 @@ module.exports.register = async (interestStockDto) => {
     const { stockKey, userKey, partyKey } = interestStockDto;
 
     const existingInterestStock = await InterestStock.findOne({
-      stockKey: stockKey,
-      userKey: userKey,
-      partyKey: partyKey,
+      where: {
+        stockKey: stockKey,
+        partyKey: partyKey,
+      },
     });
 
     // 이미 존재하는 경우 등록하지 않음
@@ -46,12 +47,8 @@ module.exports.register = async (interestStockDto) => {
  */
 module.exports.vote = async (interestStockDto) => {
   try {
-    const { userKey, interestStockKey, isApproved } = interestStockDto;
-
-    const party = await InterestStock.findOne({
-      where: { interestStockKey: interestStockKey },
-    });
-    const partyKey = party.dataValues.partyKey;
+    const { userKey, interestStockKey, partyKey, isApproved } =
+      interestStockDto;
 
     const partyMember = await PartyMember.findOne({
       where: { userKey: userKey, partyKey: partyKey },
@@ -95,12 +92,7 @@ module.exports.vote = async (interestStockDto) => {
 
 module.exports.changeApprovalResult = async (interestStockDto) => {
   try {
-    const { interestStockKey } = interestStockDto;
-
-    const party = await InterestStock.findOne({
-      where: { interestStockKey: interestStockKey },
-    });
-    const partyKey = party.dataValues.partyKey;
+    const { interestStockKey, partyKey } = interestStockDto;
 
     //모임멤버 수
     const partyMemberCnt = await PartyMember.count({
