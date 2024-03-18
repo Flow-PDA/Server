@@ -131,4 +131,59 @@ router.get("/hotIssue", async (req, res, next) => {
     console.error(err);
   }
 });
+
+// [GET] 주식 매수/매도
+// VTTC0802U : 주식 현금 매수 주문
+// VTTC0801U : 주식 현금 매도 주문
+router.post("/orderStock", async (req, res, next) => {
+  try {
+    const tr_id = req.body.tr_id;
+    const CANO = req.body.CANO; // 계좌 앞 8자리
+    const ACNT_PRDT_CD = req.body.ACNT_PRDT_CD; //계좌 뒤 2자리
+    const PDNO = req.body.PDNO; // 종목코드
+    const ORD_DVSN = req.body.ORD_DVSN; // 주문구분
+    const ORD_QTY = req.body.ORD_QTY; // 주문수량
+    const ORD_UNPR = req.body.ORD_UNPR; //주문단가
+
+    let data = JSON.stringify({
+      CANO: `${CANO}`,
+      ACNT_PRDT_CD: `${ACNT_PRDT_CD}`,
+      PDNO: `${PDNO}`,
+      ORD_DVSN: `${ORD_DVSN}`,
+      ORD_QTY: `${ORD_QTY}`,
+      ORD_UNPR: `${ORD_UNPR}`,
+    });
+
+    let config = {
+      method: "post",
+      maxBodyLength: Infinity,
+      url: "https://openapivts.koreainvestment.com:29443/uapi/domestic-stock/v1/trading/order-cash",
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${TOKEN}`,
+        appkey: `${APP_KEY}`,
+        appsecret: `${APP_SECRET}`,
+        tr_id: `${tr_id}`,
+        hashkey: "",
+      },
+      data: data,
+    };
+
+    const result = axios
+      .request(config)
+      .then((response) => {
+        console.log(JSON.stringify(response.data));
+        const resp = response.data.output;
+        return res
+          .status(201)
+          .json({ msg: `${resp.ORD_TMD}에 주문이 완료되었습니다.` });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ msg: "ERROR MESSAGE" });
+  }
+});
 module.exports = router;
