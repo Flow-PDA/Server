@@ -20,7 +20,7 @@ let config = {
     "content-type": "application/json",
     authorization: `Bearer ${TOKEN}`,
     appkey: `${APP_KEY}`,
-    appsecret:`${APP_SECRET}`,
+    appsecret: `${APP_SECRET}`,
     tr_id: `${TR_ID}`,
   },
   // data: data,
@@ -200,6 +200,15 @@ router.delete("/:partyKey/members", async (req, res, next) => {
   } catch (err) {
     console.error(err);
     return res.status(500).json({ msg: "ERROR MESSAGE" });
+  }
+});
+
+//모임원 초대링크 보내기
+router.post("/:partyKey/invite", async (req, res, next) => {
+  try {
+  } catch (error) {
+    console.error(error);
+    throw new Error(error);
   }
 });
 module.exports = router;
