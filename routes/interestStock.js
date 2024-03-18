@@ -16,7 +16,7 @@ router.post("/:partyKey", jwtAuthenticator, async (req, res, next) => {
     };
     // using service layer
 
-    const result = await interestStockService.register(interestStockDto);
+    await interestStockService.register(interestStockDto);
 
     const resBody = {
       msg: "관심 목록 등록",

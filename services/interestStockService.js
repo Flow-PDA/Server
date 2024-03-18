@@ -33,8 +33,6 @@ module.exports.register = async (interestStockDto) => {
     } else {
       console.log("이미 등록된 주식입니다!");
     }
-
-    //나중에 문제 없으면 삭제 필요
   } catch (error) {
     throw error;
   }
@@ -76,9 +74,6 @@ module.exports.vote = async (interestStockDto) => {
         isApproved: isApproved,
       });
     }
-
-    //나중에 삭제 필요
-    return voteParticipant;
   } catch (error) {
     throw error;
   }
@@ -119,8 +114,6 @@ module.exports.changeApprovalResult = async (interestStockDto) => {
         }
       );
     }
-
-    return InterestStock;
   } catch (error) {
     throw error;
   }
@@ -250,9 +243,6 @@ module.exports.delApproved = async (interestStockKey) => {
     const interestStock = await InterestStock.destroy({
       where: { interestStockKey: interestStockKey },
     });
-
-    //나중에 문제 없으면 삭제 필요
-    return interestStock;
   } catch (error) {
     throw error;
   }
