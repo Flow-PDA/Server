@@ -12,13 +12,32 @@ const Parties = db.Parties;
 //이체하기
 module.exports.transfer = async (TransferDetailDto) => {
   // console.log(userDto);
-  const transferDetail = await TransferDetails.create(TransferDetailDto);
 
+  const party = await Parties.findOne({
+    where: {
+      partyKey: TransferDetailDto.partyKey,
+    },
+  });
+
+  if (!party) {
+    throw new Error("파티를 찾을 수 없습니다.");
+  }
+
+  // 파티의 예금에서 이체 금액을 빼고 저장
+  party.deposit -= TransferDetailDto.price;
+  await party.save();
+
+  // 이체 상세 정보 생성
+  const transferDetail = await TransferDetails.create({
+    ...TransferDetailDto,
+    deposit: party.deposit,
+  });
   const res = {
     name: transferDetail.name,
     accountNumber: transferDetail.accountNumber,
     price: transferDetail.price,
   };
+
   // console.log(res);
   return res;
 };
