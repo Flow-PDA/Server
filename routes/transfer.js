@@ -9,7 +9,6 @@ router.get("/:partyKey", async (req, res, next) => {
   try {
     const { partyKey } = req.params;
     const transferList = await Transfer.getTransferList(partyKey);
-    console.log(transferList);
 
     res.status(200).json({
       msg: "이체 내역 조회 성공",
@@ -37,7 +36,7 @@ router.post("/:partyKey", jwtAuthenticator, async (req, res, next) => {
       transferType: 1,
       accountNumber: accountNumber,
       name: name,
-      deposit: deposit - price,
+      deposit: deposit,
       // deposit: deposit - price, // 한투 api에서 예수금을 받아오는건지, 아니면 모임에서 참조한 deposit을 받아오는건지 ?
     };
 

@@ -13,8 +13,26 @@ const partyService = require("../services/partyService.js");
 
 //이체하기
 module.exports.transfer = async (TransferDetailDto) => {
-  // console.log(userDto);
-  const transferDetail = await TransferDetails.create(TransferDetailDto);
+  const party = await Parties.findOne({
+    where: {
+      partyKey: TransferDetailDto.partyKey,
+    },
+  });
+
+  if (!party) {
+    throw new Error("파티를 찾을 수 없습니다.");
+  }
+
+  console.log(party.transferSum);
+
+  // 파티의 예수금에서 이체 금액을 빼고 저장
+  party.transferSum -= TransferDetailDto.price;
+  // console.log(party.transferSum);
+  await party.save();
+  party.deposit += party.transferSum;
+  // console.log(party.deposit);
+  await party.save();
+
 
   //알림 시작
   const partyMembers = await partyService.getPartyMember(
@@ -38,6 +56,13 @@ module.exports.transfer = async (TransferDetailDto) => {
     });
   });
   // 알림 끝
+
+
+  // 이체 상세 정보 생성
+  const transferDetail = await TransferDetails.create({
+    ...TransferDetailDto,
+    deposit: party.deposit,
+  });
 
   const res = {
     name: transferDetail.name,
