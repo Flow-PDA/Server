@@ -31,6 +31,9 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.DATEONLY,
         allowNull: true,
       },
+      transferSum: {
+        type: Sequelize.BIGINT,
+      },
     },
     {
       // column name : camelCase to snake_case

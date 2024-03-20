@@ -11,7 +11,7 @@ const TR_ID = process.env.TR_ID;
 const TOKEN = process.env.TOKEN;
 
 //한투
-let data = null;
+// let data = null;
 
 let config = {
   method: "get",
@@ -36,15 +36,30 @@ const User = db.Users;
 
 // service use
 const partyService = require("../services/partyService.js");
+async function fetchData() {
+  try {
+    const response = await axios.request(config);
 
-// [Post] 모임 생성하기 및 모임 멤버에 관리자 추가
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    throw error; // 에러를 다시 throw하여 호출하는 쪽에서 처리할 수 있도록 합니다.
+  }
+}
 router.post("/", jwtAuthenticator, async (req, res, next) => {
   try {
+    const tempData = await fetchData(); // 데이터 가져오기
+    console.log(tempData);
+    const tmp = tempData.output2[0];
+    console.log("tmp!!!!", tmp);
     const userKey = req.jwt.payload.key;
     const partyDto = {
       name: req.body.name,
       accountNumber: req.body.accountNumber,
+
+      deposit: parseInt(tmp.dnca_tot_amt),
     };
+
     const result = await Party.create(partyDto);
 
     const memberDto = {
@@ -55,9 +70,9 @@ router.post("/", jwtAuthenticator, async (req, res, next) => {
     };
 
     const memberResult = await PartyMember.create(memberDto);
+
     const resBody = {
       msg: "모임 생성",
-      // new_msg: `관리자 ${userKey}`,
       result: result,
       memberResuslt: memberResult,
     };
@@ -68,6 +83,7 @@ router.post("/", jwtAuthenticator, async (req, res, next) => {
     return res.status(500).json({ msg: "ERROR MESSAGE" });
   }
 });
+
 // Groups 추가!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // [GET] 모임 조회하기
 router.get("/", jwtAuthenticator, async (req, res, next) => {
@@ -129,7 +145,6 @@ router.put("/:partyKey/goals", async (req, res, next) => {
           goal: req.body.goal,
           goalPrice: req.body.goalPrice,
           goalDate: req.body.goalDate,
-          deposit: parseInt(tempData.dnca_tot_amt),
         };
 
         const result = Party.update(partyDto, {
@@ -193,7 +208,7 @@ router.get("/:partyKey/members", async (req, res, next) => {
 // [POST] 특정 모임에 일반 멤버 추가
 router.post("/:partyKey/members", jwtAuthenticator, async (req, res, next) => {
   try {
-    const userKey = req.jwt.payload.key
+    const userKey = req.jwt.payload.key;
     const memberDto = {
       userKey: userKey, //임시
       partyKey: req.params.partyKey,
