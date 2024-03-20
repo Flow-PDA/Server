@@ -52,7 +52,10 @@ module.exports.login = async (loginDto) => {
   if (!user) {
     throw { name: "IncorrectEmailError", message: "Incorrect email" };
   }
-  const comparePassword = await bcrypt.compare(loginDto.password, user.password);
+  const comparePassword = await bcrypt.compare(
+    loginDto.password,
+    user.password
+  );
   if (!comparePassword) {
     throw { name: "IncorrectPasswordError", message: "Incorrect password" };
   }
@@ -106,4 +109,4 @@ module.exports.delete = async (userKey) => {
 
   // console.log(result); 1 or 0
   return result;
-}
+};

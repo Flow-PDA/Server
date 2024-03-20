@@ -5,9 +5,11 @@ const Stock = db.Stocks;
 const User = db.Users;
 const PartyMember = db.PartyMembers;
 const Participant = db.Participants;
-
+const Notification = db.Notifications;
+const noticeService = require("./noticeService.js");
+const partyService = require("./partyService.js");
 /**
- * 관심 목록 등록
+ * 관심 목록 등록(투표 생성)
  * @param {*} interestStockDto stockKey, partyKey, userKey are required
  * @returns 없음
  */
@@ -29,6 +31,25 @@ module.exports.register = async (interestStockDto) => {
         userKey: userKey,
         partyKey: partyKey,
       });
+
+      const partyMembers = await partyService.getPartyMember(partyKey);
+      //알림 등록
+      partyMembers.map(async (member) => {
+        const content = await noticeService.ContentByType(
+          1,
+          partyKey,
+          undefined,
+          stockKey
+        );
+
+        await Notification.create({
+          userKey: userKey,
+          partyKey: member.partyKey,
+          type: 1,
+          content: content,
+        });
+      });
+
       return createdInterestStock;
     } else {
       console.log("이미 등록된 주식입니다!");
@@ -51,6 +72,8 @@ module.exports.vote = async (interestStockDto) => {
     const partyMember = await PartyMember.findOne({
       where: { userKey: userKey, partyKey: partyKey },
     });
+
+    console.log(partyMember);
 
     const partyMemberKey = partyMember.dataValues.partyMemberKey;
     let voteParticipant;
@@ -113,6 +136,30 @@ module.exports.changeApprovalResult = async (interestStockDto) => {
           where: { interestStockKey: interestStockKey },
         }
       );
+
+      //알림 등록
+      const partyMembers = await partyService.getPartyMember(partyKey);
+      const stockKey = await InterestStock.findOne({
+        where: {
+          interestStockKey: interestStockKey,
+        },
+      }).then((data) => data.stockKey);
+
+      partyMembers.map(async (member) => {
+        const content = await noticeService.ContentByType(
+          2,
+          partyKey,
+          undefined,
+          stockKey
+        );
+
+        await Notification.create({
+          userKey: member.userKey,
+          partyKey: member.partyKey,
+          type: 2,
+          content: content,
+        });
+      });
     }
   } catch (error) {
     throw error;

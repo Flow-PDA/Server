@@ -3,6 +3,7 @@ var router = express.Router();
 const axios = require("axios");
 const dotenv = require("dotenv");
 const { jwtAuthenticator } = require("../middlewares/authenticator.js");
+const noticeService = require("../services/noticeService.js");
 dotenv.config();
 
 const APP_KEY = process.env.APP_KEY;
@@ -193,7 +194,7 @@ router.get("/:partyKey/members", async (req, res, next) => {
 // [POST] 특정 모임에 일반 멤버 추가
 router.post("/:partyKey/members", jwtAuthenticator, async (req, res, next) => {
   try {
-    const userKey = req.jwt.payload.key
+    const userKey = req.jwt.payload.key;
     const memberDto = {
       userKey: userKey, //임시
       partyKey: req.params.partyKey,
