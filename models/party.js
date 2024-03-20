@@ -33,6 +33,7 @@ module.exports = (sequelize, Sequelize) => {
       },
       transferSum: {
         type: Sequelize.BIGINT,
+        defaultValue: 0,
       },
     },
     {
