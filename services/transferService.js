@@ -2,7 +2,9 @@
 const { db } = require("../modules");
 const TransferDetails = db.TransferDetails;
 const Parties = db.Parties;
-
+const Notification = db.Notifications;
+const noticeService = require("../services/noticeService.js");
+const partyService = require("../services/partyService.js");
 /**
  * create transfer
  * @param {*} TransferDetailDto partyKey, userKey, price, transferType, time, accountNumber, name, deposit art required
@@ -31,18 +33,43 @@ module.exports.transfer = async (TransferDetailDto) => {
   // console.log(party.deposit);
   await party.save();
 
+
+  //알림 시작
+  const partyMembers = await partyService.getPartyMember(
+    transferDetail.partyKey
+  );
+
+  const content = await noticeService.ContentByType(
+    3,
+    transferDetail.partyKey,
+    transferDetail.userKey,
+    undefined,
+    transferDetail.transferKey
+  );
+
+  partyMembers.map(async (member) => {
+    await Notification.create({
+      userKey: member.userKey,
+      partyKey: member.partyKey,
+      type: 3,
+      content: content,
+    });
+  });
+  // 알림 끝
+
+
   // 이체 상세 정보 생성
   const transferDetail = await TransferDetails.create({
     ...TransferDetailDto,
     deposit: party.deposit,
   });
+
   const res = {
     name: transferDetail.name,
     accountNumber: transferDetail.accountNumber,
     price: transferDetail.price,
   };
 
-  // console.log(res);
   return res;
 };
 

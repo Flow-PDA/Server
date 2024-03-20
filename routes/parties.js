@@ -3,6 +3,7 @@ var router = express.Router();
 const axios = require("axios");
 const dotenv = require("dotenv");
 const { jwtAuthenticator } = require("../middlewares/authenticator.js");
+const noticeService = require("../services/noticeService.js");
 dotenv.config();
 
 const APP_KEY = process.env.APP_KEY;
