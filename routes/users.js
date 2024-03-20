@@ -13,10 +13,10 @@ router.post(
   "/signup",
   [
     body("email").exists().isEmail(),
-    body("name").exists().isLength({ max: 10 }),
-    body("password").exists(),
-    body("phoneNumber").exists(),
-    body("birth").exists(),
+    body("name").exists().isLength({ min: 1, max: 10 }),
+    body("password").exists().notEmpty(),
+    body("phoneNumber").exists().notEmpty(),
+    body("birth").exists().notEmpty(),
     validatorErrorHanlder,
   ],
   async (req, res, next) => {
@@ -72,7 +72,7 @@ router.post(
   "/login",
   [
     body("email").exists().isEmail(),
-    body("password").exists(),
+    body("password").exists().notEmpty(),
     validatorErrorHanlder,
   ],
   async (req, res, next) => {
@@ -174,33 +174,37 @@ router.put(
 );
 
 // [DELETE] leave
-router.delete("/:userKey", [param("userKey").isNumeric(), validatorErrorHanlder], jwtAuthenticator, async (req, res, next) => {
-  try {
-    const userKey = req.params.userKey;
-    if (userKey != req.jwt.payload.key) {
-      throw {
-        name: "UnauthorizedAccessError",
-        message: "unauthorized access",
-      };
-    }
-    const result = await userService.delete(userKey);
+router.delete(
+  "/:userKey",
+  [param("userKey").isNumeric(), validatorErrorHanlder],
+  jwtAuthenticator,
+  async (req, res, next) => {
+    try {
+      const userKey = req.params.userKey;
+      if (userKey != req.jwt.payload.key) {
+        throw {
+          name: "UnauthorizedAccessError",
+          message: "unauthorized access",
+        };
+      }
+      const result = await userService.delete(userKey);
 
-    if (result == 1) {
-      res.status(200).json({ msg: result });
-    } else {
-      res.status(404).json({ msg: `${userKey} user does not exists` });
+      if (result == 1) {
+        res.status(200).json({ msg: result });
+      } else {
+        res.status(404).json({ msg: `${userKey} user does not exists` });
+      }
+      return res;
+    } catch (error) {
+      console.log(error);
+      if (error.name === "UnauthorizedAccessError") {
+        res.status(401).json({ msg: "Unauthorized" });
+      } else {
+        res.status(500).json({ msg: "Error" });
+      }
+      return res;
     }
-    return res;
-  } catch (error) {
-    console.log(error);
-    if (error.name === "UnauthorizedAccessError") {
-      res.status(401).json({ msg: "Unauthorized" });
-    }
-    else {
-      res.status(500).json({ msg: "Error" });
-    }
-    return res;
   }
-})
+);
 
 module.exports = router;
