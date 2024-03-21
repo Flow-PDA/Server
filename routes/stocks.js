@@ -105,10 +105,11 @@ router.get("/investStrategy", jwtAuthenticator, async (req, res, next) => {
 });
 
 // [GET] 신한 - 핫 이슈
-router.get("/hotIssue", jwtAuthenticator, async (req, res, next) => {
+router.get("/hotIssue", async (req, res, next) => {
   try {
     // tag 타입 지정
-    const tag = req.body.tag;
+    const tag = req.query.tag;
+    console.log(tag);
     let config = {
       method: "get",
       maxBodyLength: Infinity,
@@ -121,6 +122,7 @@ router.get("/hotIssue", jwtAuthenticator, async (req, res, next) => {
     const result = axios
       .request(config)
       .then((response) => {
+        console.log(response.data.dataBody);
         return res.status(200).json(response.data.dataBody);
       })
       .catch((error) => {
