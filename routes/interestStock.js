@@ -65,7 +65,7 @@ router.post(
 );
 
 // [GET] get 승인 중인 관심 list
-router.get("/:partyKey/approval", async (req, res, next) => {
+router.get("/:partyKey/approval", jwtAuthenticator, async (req, res, next) => {
   try {
     const partyKey = req.params.partyKey;
     const result = await interestStockService.getApproval(partyKey);
@@ -85,7 +85,7 @@ router.get("/:partyKey/approval", async (req, res, next) => {
 });
 
 // [GET] get 승인된 관심 list
-router.get("/:partyKey/approved", async (req, res, next) => {
+router.get("/:partyKey/approved", jwtAuthenticator, async (req, res, next) => {
   try {
     const partyKey = req.params.partyKey;
     const result = await interestStockService.getApproved(partyKey);
@@ -105,23 +105,26 @@ router.get("/:partyKey/approved", async (req, res, next) => {
 });
 
 // [DELETE] 승인된 관심 종목 빼기
-router.delete("/:partyKey/:interestStockKey", async (req, res, next) => {
-  try {
-    const interestStockKey = req.params.interestStockKey;
+router.delete(
+  "/:partyKey/:interestStockKey",
+  jwtAuthenticator,
+  async (req, res, next) => {
+    try {
+      const interestStockKey = req.params.interestStockKey;
+      await interestStockService.delApproved(interestStockKey);
 
-    await interestStockService.delApproved(interestStockKey);
+      const resBody = {
+        msg: "승인된 관심 종목 삭제",
+      };
 
-    const resBody = {
-      msg: "승인된 관심 종목 삭제",
-    };
-
-    return res.status(200).json(resBody);
-  } catch (err) {
-    console.log(err);
-    return res
-      .status(500)
-      .json({ msg: "ERROR MESSAGE: 승인된 관심주식 del 오류" });
+      return res.status(200).json(resBody);
+    } catch (err) {
+      console.log(err);
+      return res
+        .status(500)
+        .json({ msg: "ERROR MESSAGE: 승인된 관심주식 del 오류" });
+    }
   }
-});
+);
 
 module.exports = router;
