@@ -30,7 +30,7 @@ module.exports = (sequelize, Sequelize) => {
           key: "stock_key",
         },
       },
-      averagePrice: {
+      price: {
         type: Sequelize.INTEGER,
         defaultValue: 0,
       },
@@ -38,6 +38,7 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.BIGINT,
         defaultValue: 0,
       },
+      //0 for 매수, 1 for 매도
       transactionType: {
         type: Sequelize.INTEGER(1),
         defaultValue: 0,
