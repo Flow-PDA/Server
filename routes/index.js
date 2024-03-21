@@ -7,6 +7,7 @@ var partiesRouter = require("./parties");
 var transfersRouter = require("./transfer");
 var stocksRouter = require("./stocks");
 var noticeRouter = require("./notices");
+var pointRouter = require("./points");
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
@@ -19,5 +20,6 @@ router.use("/parties", partiesRouter);
 router.use("/transfers", transfersRouter);
 router.use("/stocks", stocksRouter);
 router.use("/notifications", noticeRouter);
+router.use("/points", pointRouter);
 
 module.exports = router;
