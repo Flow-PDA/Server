@@ -27,7 +27,7 @@ let hankookConfig = {
 };
 
 // [GET] 신한 - 지금 뜨는 테마
-router.get("/hotTheme", async (req, res, next) => {
+router.get("/hotTheme", jwtAuthenticator, async (req, res, next) => {
   try {
     let config = {
       method: "get",
@@ -53,7 +53,7 @@ router.get("/hotTheme", async (req, res, next) => {
 });
 
 // [GET] 신한 - 마켓 이슈
-router.get("/marketIssue", async (req, res, next) => {
+router.get("/marketIssue", jwtAuthenticator, async (req, res, next) => {
   try {
     let config = {
       method: "get",
@@ -79,7 +79,7 @@ router.get("/marketIssue", async (req, res, next) => {
 });
 
 // [GET] 신한 - 투자 전략
-router.get("/investStrategy", async (req, res, next) => {
+router.get("/investStrategy", jwtAuthenticator, async (req, res, next) => {
   try {
     let config = {
       method: "get",
@@ -105,7 +105,7 @@ router.get("/investStrategy", async (req, res, next) => {
 });
 
 // [GET] 신한 - 핫 이슈
-router.get("/hotIssue", async (req, res, next) => {
+router.get("/hotIssue", jwtAuthenticator, async (req, res, next) => {
   try {
     // tag 타입 지정
     const tag = req.body.tag;
@@ -135,7 +135,7 @@ router.get("/hotIssue", async (req, res, next) => {
 // [GET] 주식 매수/매도
 // VTTC0802U : 주식 현금 매수 주문
 // VTTC0801U : 주식 현금 매도 주문
-router.post("/orderStock", async (req, res, next) => {
+router.post("/orderStock", jwtAuthenticator, async (req, res, next) => {
   try {
     const tr_id = req.body.tr_id;
     const CANO = req.body.CANO; // 계좌 앞 8자리
@@ -181,6 +181,15 @@ router.post("/orderStock", async (req, res, next) => {
       .catch((error) => {
         console.log(error);
       });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ msg: "ERROR MESSAGE" });
+  }
+});
+
+//거래 내역 조회
+router.get("/transactionHistory", jwtAuthenticator, async (req, res, next) => {
+  try {
   } catch (err) {
     console.error(err);
     return res.status(500).json({ msg: "ERROR MESSAGE" });

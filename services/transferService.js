@@ -26,11 +26,9 @@ module.exports.transfer = async (TransferDetailDto) => {
   console.log(party.transferSum);
 
   // 파티의 예수금에서 이체 금액을 빼고 저장
-  party.transferSum -= TransferDetailDto.price;
-  // console.log(party.transferSum);
-  await party.save();
-  party.deposit += party.transferSum;
-  // console.log(party.deposit);
+
+  party.deposit -= TransferDetailDto.price;
+  console.log(party.deposit);
   await party.save();
 
 
@@ -121,9 +119,11 @@ module.exports.getRecentTransferList = async (partyKey) => {
         partyKey: partyKey,
         transferType: 1, // 0:입금 1:출금
       },
-      limit: 4,
+
       order: [["createdAt", "DESC"]],
     });
+
+    console.log(transferDetails);
 
     if (!transferDetails || transferDetails.length === 0) {
       throw new Error("No recent transaction detail found");
