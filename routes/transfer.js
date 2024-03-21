@@ -5,7 +5,7 @@ const Transfer = require("../services/transferService.js");
 //partyKey, userKey, price, transferType, time, accountNumber, name, deposit art required
 
 //이체 내역 조회 /transfers/:partyKey 10개씩
-router.get("/:partyKey", async (req, res, next) => {
+router.get("/:partyKey", jwtAuthenticator, async (req, res, next) => {
   try {
     const { partyKey } = req.params;
     const transferList = await Transfer.getTransferList(partyKey);
@@ -57,7 +57,7 @@ router.post("/:partyKey", jwtAuthenticator, async (req, res, next) => {
 });
 
 //최근 보낸 계좌 리스트 조회 /transfers/:partyKey/recents
-router.get("/:partyKey/recents", async (req, res, next) => {
+router.get("/:partyKey/recents", jwtAuthenticator, async (req, res, next) => {
   try {
     const { partyKey } = req.params;
     const transferList = await Transfer.getRecentTransferList(partyKey);
