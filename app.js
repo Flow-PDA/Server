@@ -13,7 +13,12 @@ var app = express();
 // CORS 설정, 클라이언트 HOST와 맞추어야 함
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:3000"],
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:3000",
+      "http://127.0.0.1:5173",
+      "http://127.0.0.1:3000",
+    ],
     credentials: true,
   })
 );
