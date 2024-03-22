@@ -3,6 +3,9 @@ var router = express.Router();
 const axios = require("axios");
 const dotenv = require("dotenv");
 const { jwtAuthenticator } = require("../middlewares/authenticator.js");
+
+const stockService = require("../services/stockService.js");
+
 dotenv.config();
 
 const APP_KEY = process.env.APP_KEY;
@@ -190,7 +193,7 @@ router.post("/orderStock", jwtAuthenticator, async (req, res, next) => {
 });
 
 //거래 내역 조회
-router.get("/transactionHistory", jwtAuthenticator, async (req, res, next) => {
+router.get("/transactionDetail", jwtAuthenticator, async (req, res, next) => {
   try {
   } catch (err) {
     console.error(err);

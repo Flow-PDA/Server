@@ -37,7 +37,6 @@ router.post("/:partyKey", jwtAuthenticator, async (req, res, next) => {
       accountNumber: accountNumber,
       name: name,
       deposit: deposit,
-      // deposit: deposit - price, // 한투 api에서 예수금을 받아오는건지, 아니면 모임에서 참조한 deposit을 받아오는건지 ?
     };
 
     console.log(transferDetailDto);
