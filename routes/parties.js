@@ -103,7 +103,7 @@ router.get("/", jwtAuthenticator, async (req, res, next) => {
 });
 
 // [GET] 특정 모임 조회하기
-router.get("/:partyKey", async (req, res, next) => {
+router.get("/:partyKey", jwtAuthenticator,async (req, res, next) => {
   try {
     const result = await Party.findOne({
       where: { party_key: req.params.partyKey },
@@ -121,7 +121,7 @@ router.get("/:partyKey", async (req, res, next) => {
 });
 
 // [PUT] 특정 모임 정보 설정하기
-router.put("/:partyKey/goals", async (req, res, next) => {
+router.put("/:partyKey/goals", jwtAuthenticator,async (req, res, next) => {
   try {
     //한투
     async function fetchData() {
@@ -168,7 +168,7 @@ router.put("/:partyKey/goals", async (req, res, next) => {
 });
 
 // [DELETE] 특정 모임 삭제하기
-router.delete("/:partyKey", async (req, res, next) => {
+router.delete("/:partyKey", jwtAuthenticator,async (req, res, next) => {
   try {
     const result = await Party.destroy({
       where: { party_key: req.params.partyKey },
@@ -185,7 +185,7 @@ router.delete("/:partyKey", async (req, res, next) => {
   }
 });
 // [GET] 특정 모임에 속한 모임원들 조회
-router.get("/:partyKey/members", async (req, res, next) => {
+router.get("/:partyKey/members", jwtAuthenticator,async (req, res, next) => {
   try {
     const partyKey = req.params.partyKey;
     const result = await PartyMember.findAll({
@@ -226,7 +226,7 @@ router.post("/:partyKey/members", jwtAuthenticator, async (req, res, next) => {
   }
 });
 //[DELETE] 특정 모임원 내보내기
-router.delete("/:partyKey/members", async (req, res, next) => {
+router.delete("/:partyKey/members", jwtAuthenticator,async (req, res, next) => {
   try {
     const userKey = req.body.userKey;
 
@@ -245,7 +245,7 @@ router.delete("/:partyKey/members", async (req, res, next) => {
 });
 
 //모임원 초대링크 보내기
-router.post("/:partyKey/invite", async (req, res, next) => {
+router.post("/:partyKey/invite", jwtAuthenticator,async (req, res, next) => {
   try {
   } catch (error) {
     console.error(error);
