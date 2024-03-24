@@ -23,14 +23,19 @@ module.exports.transfer = async (TransferDetailDto) => {
     throw new Error("파티를 찾을 수 없습니다.");
   }
 
-  console.log(party.transferSum);
-
   // 파티의 예수금에서 이체 금액을 빼고 저장
 
   party.deposit -= TransferDetailDto.price;
   console.log(party.deposit);
   await party.save();
 
+  // 이체 상세 정보 생성
+  const transferDetail = await TransferDetails.create({
+    ...TransferDetailDto,
+    deposit: party.deposit,
+  });
+
+  console.log(transferDetail);
 
   //알림 시작
   const partyMembers = await partyService.getPartyMember(
@@ -54,13 +59,6 @@ module.exports.transfer = async (TransferDetailDto) => {
     });
   });
   // 알림 끝
-
-
-  // 이체 상세 정보 생성
-  const transferDetail = await TransferDetails.create({
-    ...TransferDetailDto,
-    deposit: party.deposit,
-  });
 
   const res = {
     name: transferDetail.name,
@@ -94,7 +92,7 @@ module.exports.getTransferList = async (partyKey) => {
     });
 
     if (!transferDetails || transferDetails.length === 0) {
-      throw new Error("No transaction detail found");
+      throw new Error("No transfer detail found");
     }
 
     const res = transferDetails.map((detail) => ({
@@ -114,6 +112,7 @@ module.exports.getTransferList = async (partyKey) => {
 //최근 보낸 계좌 리스트 조회 /transfers/:partyKey/recents
 module.exports.getRecentTransferList = async (partyKey) => {
   try {
+    console.log();
     const transferDetails = await TransferDetails.findAll({
       where: {
         partyKey: partyKey,
