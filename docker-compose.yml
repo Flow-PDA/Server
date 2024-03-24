@@ -14,7 +14,7 @@ services:
       - --collation-server=utf8mb4_unicode_ci
     volumes:
       - ./docker_volume/mysql/data:/var/lib/mysql
-    profiles: [initdb]
+    # profiles: [initdb]
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 20s
