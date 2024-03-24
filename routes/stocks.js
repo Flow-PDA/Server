@@ -136,7 +136,84 @@ router.get("/hotIssue", async (req, res, next) => {
     console.error(err);
   }
 });
+// [GET] 주식 현재가 조회
+router.get("/inquire", async (req, res, next) => {
+  try {
+    stock_code = req.query.stock_code;
+    console.log("code:", stock_code);
+    let config = {
+      method: "get",
+      maxBodyLength: Infinity,
+      url: `https://openapivts.koreainvestment.com:29443/uapi/domestic-stock/v1/quotations/inquire-price?fid_cond_mrkt_div_code=J&fid_input_iscd=${stock_code}`,
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${TOKEN}`,
+        appkey: `${APP_KEY}`,
+        appsecret: `${APP_SECRET}`,
+        tr_id: `FHKST01010100`,
+      },
+      // data: data,
+    };
 
+    const result = axios
+      .request(config)
+      .then((response) => {
+        // console.log(JSON.stringify(response.data));
+        const resp = response.data.output;
+        const resBody = {
+          prdy_vrss: resp.prdy_vrss,
+          prdy_vrss_sign: resp.prdy_vrss_sign,
+          prdy_ctrt: resp.prdy_ctrt,
+          stck_prpr: resp.stck_prpr,
+        };
+        console.log(resBody);
+        return res.status(200).json(resBody);
+      })
+      .catch((error) => {
+        // console.log(error);
+      });
+  } catch (err) {
+    console.error(err);
+  }
+});
+// CANO도 바꿔줘야함!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!진짜 힘드네여...
+// [GET] 잔액 현재가 조회
+router.get("/inquireDeposit", async (req, res, next) => {
+  try {
+    let config = {
+      method: "get",
+      maxBodyLength: Infinity,
+      url: "https://openapivts.koreainvestment.com:29443/uapi/domestic-stock/v1/trading/inquire-balance?CANO=50105802&ACNT_PRDT_CD=02&AFHR_FLPR_YN=N&OFL_YN=&INQR_DVSN=01&UNPR_DVSN=01&FUND_STTL_ICLD_YN=N&FNCG_AMT_AUTO_RDPT_YN=N&PRCS_DVSN=00&CTX_AREA_FK100=&CTX_AREA_NK100=",
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${TOKEN}`,
+        appkey: `${APP_KEY}`,
+        appsecret: `${APP_SECRET}`,
+        tr_id: "VTTC8434R",
+      },
+      // data: data,
+    };
+
+    const result = axios
+      .request(config)
+      .then((response) => {
+        console.log(JSON.stringify(response.data.output2));
+        const resp = response.data.output2[0];
+        const resBody = {
+          dnca_tot_amt: resp.dnca_tot_amt, //총 예수금
+          tot_evlu_amt: resp.tot_evlu_amt, //총 평가금액
+          pchs_amt_smtl_amt: resp.pchs_amt_smtl_amt, // 매입금액합계
+          evlu_amt_smtl_amt: resp.evlu_amt_smtl_amt, //평가금액합계
+        };
+        return res.status(200).json(resBody);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  } catch (err) {
+    console.error(err);
+  }
+});
 // [GET] 주식 매수/매도
 // VTTC0802U : 주식 현금 매수 주문
 // VTTC0801U : 주식 현금 매도 주문
