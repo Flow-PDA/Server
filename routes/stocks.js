@@ -133,6 +133,46 @@ router.get("/hotIssue", async (req, res, next) => {
     console.error(err);
   }
 });
+// [GET] 주식 현재가 조회
+router.get("/inquire", async (req, res, next) => {
+  try {
+    stock_code = req.query.stock_code;
+    console.log("code:", stock_code);
+    let config = {
+      method: "get",
+      maxBodyLength: Infinity,
+      url: `https://openapivts.koreainvestment.com:29443/uapi/domestic-stock/v1/quotations/inquire-price?fid_cond_mrkt_div_code=J&fid_input_iscd=${stock_code}`,
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${TOKEN}`,
+        appkey: `${APP_KEY}`,
+        appsecret: `${APP_SECRET}`,
+        tr_id: `FHKST01010100`,
+      },
+      // data: data,
+    };
+
+    const result = axios
+      .request(config)
+      .then((response) => {
+        // console.log(JSON.stringify(response.data));
+        const resp = response.data.output;
+        const resBody = {
+          prdy_vrss: resp.prdy_vrss,
+          prdy_vrss_sign: resp.prdy_vrss_sign,
+          prdy_ctrt: resp.prdy_ctrt,
+          stck_prpr: resp.stck_prpr,
+        };
+        console.log(resBody);
+        return res.status(200).json(resBody);
+      })
+      .catch((error) => {
+        // console.log(error);
+      });
+  } catch (err) {
+    console.error(err);
+  }
+});
 
 // [GET] 주식 매수/매도
 // VTTC0802U : 주식 현금 매수 주문
