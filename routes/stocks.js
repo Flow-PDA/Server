@@ -193,11 +193,24 @@ router.post("/orderStock", jwtAuthenticator, async (req, res, next) => {
 });
 
 //거래 내역 조회
-router.get("/transactionDetail", jwtAuthenticator, async (req, res, next) => {
-  try {
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ msg: "ERROR MESSAGE" });
+router.get(
+  "/:partyKey/transactionDetail",
+  jwtAuthenticator,
+  async (req, res, next) => {
+    try {
+      const partyKey = req.params.partyKey;
+      const result = await stockService.getTransactionDetail(partyKey);
+
+      const resBody = {
+        msg: "거래 내역 조회",
+        result: result,
+      };
+
+      return res.status(200).json(resBody);
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ msg: "ERROR MESSAGE" });
+    }
   }
-});
+);
 module.exports = router;
