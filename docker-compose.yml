@@ -1,9 +1,7 @@
 services:
   mysql-prod:
     container_name: flow-mysql
-    build:
-      context: ./
-      dockerfile: Dockerfile.mysql
+    image: mysql:8.0.36
     restart: unless-stopped
     env_file: .env.mysql
     environment:
@@ -14,6 +12,7 @@ services:
       - --collation-server=utf8mb4_unicode_ci
     volumes:
       - ./docker_volume/mysql/data:/var/lib/mysql
+      - ./init_db/:/docker-entrypoint-initdb.d/
     # profiles: [initdb]
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
