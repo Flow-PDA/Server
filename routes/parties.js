@@ -55,8 +55,7 @@ router.post("/", jwtAuthenticator, async (req, res, next) => {
     const partyDto = {
       name: req.body.name,
       accountNumber: req.body.accountNumber,
-
-      deposit: parseInt(tmp.dnca_tot_amt),
+      deposit: 0,
     };
 
     const result = await Party.create(partyDto);
@@ -87,9 +86,9 @@ router.post("/", jwtAuthenticator, async (req, res, next) => {
 // [GET] 모임 조회하기
 router.get("/", jwtAuthenticator, async (req, res, next) => {
   try {
-    const value = req.jwt.payload;
+    const userKey = req.jwt.payload.key;
     // 이부분에 jwt.payload에서 가입한 group 나옴,//
-    console.log("a:", value);
+    // console.log("a:", value);
     const result = await Party.findAll();
     const resBody = {
       msg: "모임 조회 결과",
