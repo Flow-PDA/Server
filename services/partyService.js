@@ -20,3 +20,12 @@ module.exports.getPartyMember = async (partyKey) => {
 
   return partyMembers;
 };
+
+module.exports.getPartyAccountNumber = async (partyKey) => {
+  const party = await Party.findOne({
+    where: {
+      partyKey: partyKey,
+    },
+  });
+  return party.accountNumber;
+};
