@@ -30,6 +30,21 @@ let hankookConfig = {
   // data: data,
 };
 
+// DB 에서 주식정보 가져오기
+router.get("/stockInfo/:stockKey", async (req, res, next) => {
+  try {
+    const stockKey = req.params.stockKey;
+    const resBody = await stockService.getStockInfo(stockKey);
+
+    return res.status(200).json(resBody);
+  } catch (error) {
+    console.error(err);
+    return res.status(500).json({
+      error: "Cannot find Stock Code",
+    });
+  }
+});
+
 // [GET] 신한 - 지금 뜨는 테마
 router.get("/hotTheme", jwtAuthenticator, async (req, res, next) => {
   try {
@@ -143,7 +158,11 @@ router.get("/inquire", async (req, res, next) => {
   try {
     const stock_code = req.query.stock_code;
 
-    console.log("code:", stock_code);
+    // const stockKey = req.params.stockKey;
+    const resBody = await stockService.getStockInfo(stock_code);
+    const stock_name = resBody.dataValues.stockName;
+    // console.log("code:", stock_name);
+
     let config = {
       method: "get",
       maxBodyLength: Infinity,
@@ -168,6 +187,7 @@ router.get("/inquire", async (req, res, next) => {
           prdy_vrss_sign: resp.prdy_vrss_sign,
           prdy_ctrt: resp.prdy_ctrt,
           stck_prpr: resp.stck_prpr,
+          stockName: stock_name,
         };
         console.log(resBody);
         return res.status(200).json(resBody);
@@ -367,20 +387,5 @@ router.get(
     }
   }
 );
-
-// DB 에서 주식정보 가져오기
-router.get("/stockInfo/:stockKey", async (req, res, next) => {
-  try {
-    const stockKey = req.params.stockKey;
-    const resBody = await stockService.getStockInfo(stockKey);
-
-    return res.status(200).json(resBody);
-  } catch (error) {
-    console.error(err);
-    return res.status(500).json({
-      error: "Cannot find Stock Code",
-    });
-  }
-});
 
 module.exports = router;

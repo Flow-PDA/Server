@@ -112,7 +112,7 @@ module.exports.ContentByType = async (
       content = `${party.name} 모임의 ${stock.stockName} 종목 투표가 등록되었습니다.`;
       break;
     case 2: // 투표 완료 알림 - 수락/거절 둘다?
-      content = `${party.name} 모임의 ${stock.stockName} 종목이 승인 되었습니다.`;
+      content = `${party.name} 모임의 ${stock.stockName} 종목이 승인완료 되었습니다.`;
       break;
     case 3: // 이체 알림
       content = `${party.name} 모임의 ${user.name}님이 ${transfer.price}원을 이체했습니다.`;
