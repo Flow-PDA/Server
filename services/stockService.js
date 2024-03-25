@@ -53,3 +53,30 @@ module.exports.getTransactionDetail = async (partyKey) => {
     throw error;
   }
 };
+
+//주식코드로 주식 정보 얻어오기
+module.exports.getStockInfo = async (stockKey) => {
+  try {
+    console.log(parseInt(stockKey));
+    if (/^[A-Za-z]/.test(stockKey)) {
+      // 주식 코드에 알파벳이 있는 경우
+      const stockInfo = await Stock.findOne({
+        where: {
+          stockKey: stockKey,
+        },
+      });
+
+      return stockInfo;
+    } else {
+      // 주식 코드에 알파벳이 없는 경우
+      const stockInfo = await Stock.findOne({
+        where: {
+          stockKey: parseInt(stockKey),
+        },
+      });
+      return stockInfo; // 앞에 붙은 0을 제거하여 문자열로 변환
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
