@@ -9,6 +9,7 @@ router.get("/:partyKey", jwtAuthenticator, async (req, res, next) => {
   try {
     const { partyKey } = req.params;
     const transferList = await Transfer.getTransferList(partyKey);
+    console.log(transferList);
 
     res.status(200).json({
       msg: "이체 내역 조회 성공",
@@ -36,7 +37,8 @@ router.post("/:partyKey", jwtAuthenticator, async (req, res, next) => {
       transferType: 1,
       accountNumber: accountNumber,
       name: name,
-      deposit: deposit,
+      deposit: deposit - price,
+      // deposit: deposit - price, // 한투 api에서 예수금을 받아오는건지, 아니면 모임에서 참조한 deposit을 받아오는건지 ?
     };
 
     console.log(transferDetailDto);
@@ -56,7 +58,7 @@ router.post("/:partyKey", jwtAuthenticator, async (req, res, next) => {
 });
 
 //최근 보낸 계좌 리스트 조회 /transfers/:partyKey/recents
-router.get("/:partyKey/recents", jwtAuthenticator, async (req, res, next) => {
+router.get("/:partyKey/recents", async (req, res, next) => {
   try {
     const { partyKey } = req.params;
     const transferList = await Transfer.getRecentTransferList(partyKey);

@@ -74,6 +74,8 @@ module.exports.getStockInfo = async (stockKey) => {
           stockKey: parseInt(stockKey),
         },
       });
+
+      console.log(stockInfo);
       return stockInfo; // 앞에 붙은 0을 제거하여 문자열로 변환
     }
   } catch (error) {
