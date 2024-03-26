@@ -21,7 +21,7 @@ module.exports.sign = async (userKey, groups, name) => {
       expiresIn: options.expiresIn,
     }),
     refreshToken: jwt.sign(payload, secretKey, {
-      expiresIn: options.expiresIn,
+      expiresIn: options.refreshTokenExpiresIn,
     }),
   };
 };
