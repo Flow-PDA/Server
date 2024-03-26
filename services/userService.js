@@ -1,6 +1,7 @@
 // controllers/tutorial.controller.js
 const { db, jwt } = require("../modules");
 const User = db.Users;
+const PartyMember = db.PartyMembers;
 const bcrypt = require("bcrypt");
 
 /**
@@ -61,10 +62,18 @@ module.exports.login = async (loginDto) => {
   }
 
   // TODO: get group list and role
-  const groupList = [];
+  const groupList = await PartyMember.findAll({
+    where: { userKey: user.userKey },
+  });
+  const groupPayload = groupList.map((elem) => {
+    return {
+      partyKey: elem.partyKey,
+      role: elem.role,
+    };
+  });
 
   // create token
-  const tokens = await jwt.sign(user.userKey, groupList, user.name);
+  const tokens = await jwt.sign(user.userKey, groupPayload, user.name);
 
   return {
     name: user.name,
