@@ -17,8 +17,8 @@ const TR_ID = process.env.TR_ID;
 const TOKEN = process.env.TOKEN;
 
 const API_KEY = process.env.API_KEY;
-
-const newsUrl = "https://search.naver.com/search.naver?where=news&query=";
+const { db } = require("../modules");
+const Stock = db.Stocks;
 
 let hankookConfig = {
   method: "get",
@@ -87,7 +87,22 @@ router.get("/stockInfo/:stockKey", async (req, res, next) => {
     });
   }
 });
-
+//DB에서 전 종목 불러오기
+router.get("/all", jwtAuthenticator, async (req, res, next) => {
+  try {
+    const tmp = [];
+    const responses = await Stock.findAll();
+    responses.forEach((response) => {
+      tmp.push({
+        stock_code: response.dataValues.stockKey,
+        stock_name: response.dataValues.stockName,
+      });
+    });
+    return res.status(200).json(tmp);
+  } catch (err) {
+    console.error(err);
+  }
+});
 // [GET] 신한 - 지금 뜨는 테마
 router.get("/hotTheme", jwtAuthenticator, async (req, res, next) => {
   try {
