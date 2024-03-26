@@ -7,5 +7,6 @@ module.exports = {
   options: {
     algorithm: "HS256",
     expiresIn: 60 * 60 * 24,
+    refreshTokenExpiresIn: 60 * 60 * 24 * 7,
   },
 };

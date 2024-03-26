@@ -12,14 +12,16 @@ const options = require("../app/config/jwt.config").options;
 module.exports.sign = async (userKey, groups, name) => {
   const payload = {
     key: userKey,
-    groups: groups,
+    // groups: groups,
     name: name,
   };
 
   return {
-    accessToken: jwt.sign(payload, secretKey, { expiresIn: options.expiresIn }),
-    refreshToken: jwt.sign(payload, secretKey, {
+    accessToken: jwt.sign({ ...payload, groups: groups }, secretKey, {
       expiresIn: options.expiresIn,
+    }),
+    refreshToken: jwt.sign(payload, secretKey, {
+      expiresIn: options.refreshTokenExpiresIn,
     }),
   };
 };
