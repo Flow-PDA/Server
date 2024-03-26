@@ -242,8 +242,9 @@ router.get("/inquire", async (req, res, next) => {
 
     // const stockKey = req.params.stockKey;
     const resBody = await stockService.getStockInfo(stock_code);
-    // const stock_name = resBody.dataValues.stockName;
-    // console.log("code:", stock_name);
+
+    const stock_name = resBody.dataValues.stockName;
+
 
     let config = {
       method: "get",

@@ -31,6 +31,7 @@ module.exports.register = async (interestStockDto) => {
         stockKey: stockKey,
         userKey: userKey,
         partyKey: partyKey,
+        isApproved: false,
       });
 
       const partyMembers = await partyService.getPartyMember(partyKey);
@@ -201,7 +202,7 @@ module.exports.getApproval = async (partyKey) => {
       // 찜 주식 키 가져오기..
       const interestStockKey = stock.dataValues.interestStockKey;
       const stockName = stockNameFind.dataValues.stockName;
-
+      const stockKey = stockNameFind.dataValues.stockKey;
       //모임 멤버 수
       const partyMemberCnt = await PartyMember.count({
         where: { partyKey: partyKey },
@@ -224,7 +225,7 @@ module.exports.getApproval = async (partyKey) => {
         },
       });
 
-      //로그인한 사람이 이 주식을 이미 승인 했는지 안했는지
+      // 로그인한 사람이 이 주식을 이미 승인 했는지 안했는지
       const isApproved = await this.isParticipated(
         partyMemberKey,
         interestStockKey
@@ -233,6 +234,7 @@ module.exports.getApproval = async (partyKey) => {
       returnValues.push({
         name: userName,
         interestStockKey: interestStockKey,
+        stockKey: stockKey,
         stockName: stockName,
         createdAt: interestStock.createdAt,
         partyMemberCnt: partyMemberCnt,
@@ -347,7 +349,13 @@ module.exports.isParticipated = async (partyMemberKey, interestStockKey) => {
         interestStockKey: interestStockKey,
       },
     });
-    const isApproved = isApprovedFind.dataValues.isApproved;
+
+    if (isApprovedFind) {
+      const isApproved = isApprovedFind.dataValues.isApproved;
+      return isApproved;
+    }
+    const isApproved = undefined;
+
     return isApproved;
   } catch (error) {
     throw error;
