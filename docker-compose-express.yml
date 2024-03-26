@@ -1,0 +1,14 @@
+services:
+  express:
+    container_name: flow-express
+    build:
+      context: ./
+      dockerfile: Dockerfile.express
+    ports:
+      - "8080:3001"
+    networks:
+      - flow-net
+
+networks:
+  flow-net:
+    name: flow-net
