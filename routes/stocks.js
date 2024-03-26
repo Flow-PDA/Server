@@ -245,7 +245,6 @@ router.get("/inquire", async (req, res, next) => {
 
     const stock_name = resBody.dataValues.stockName;
 
-
     let config = {
       method: "get",
       maxBodyLength: Infinity,
