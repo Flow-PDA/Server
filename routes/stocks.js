@@ -23,7 +23,7 @@ const Stock = db.Stocks;
 let hankookConfig = {
   method: "get",
   maxBodyLength: Infinity,
-  url: "https://openapivts.koreainvestment.com:29443/uapi/domestic-stock/v1/trading/inquire-balance?CANO=50105802&ACNT_PRDT_CD=02&AFHR_FLPR_YN=N&OFL_YN=&INQR_DVSN=01&UNPR_DVSN=01&FUND_STTL_ICLD_YN=N&FNCG_AMT_AUTO_RDPT_YN=N&PRCS_DVSN=00&CTX_AREA_FK100=&CTX_AREA_NK100=",
+  url: "https://openapivts.koreainvestment.com:29443/uapi/domestic-stock/v1/trading/inquire-balance?CANO=${CANO}&ACNT_PRDT_CD=02&AFHR_FLPR_YN=N&OFL_YN=&INQR_DVSN=01&UNPR_DVSN=01&FUND_STTL_ICLD_YN=N&FNCG_AMT_AUTO_RDPT_YN=N&PRCS_DVSN=00&CTX_AREA_FK100=&CTX_AREA_NK100=",
   headers: {
     "content-type": "application/json",
     authorization: `Bearer ${TOKEN}`,
@@ -228,7 +228,6 @@ router.get("/inquired", async (req, res, next) => {
       },
       // data: data,
     };
-
     const result = axios
       .request(config)
       .then((response) => {
@@ -299,26 +298,33 @@ router.get("/inquire", async (req, res, next) => {
 
 // CANO도 바꿔줘야함!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!진짜 힘드네여...
 // [GET] 잔액 현재가 조회
-router.get("/inquireDeposit", async (req, res, next) => {
+router.post("/inquireDeposit", async (req, res, next) => {
   try {
+    const CANO = req.body.CANO;
+    const U_APPKEY = req.body.APPKEY;
+    const U_APPSECRET = req.body.APPSECRET;
+    const U_TOKEN = req.body.TOKEN;
+
+    console.log("CANO", CANO);
+    console.log("U_TOKEN", U_TOKEN);
+
     let config = {
       method: "get",
       maxBodyLength: Infinity,
-      url: "https://openapivts.koreainvestment.com:29443/uapi/domestic-stock/v1/trading/inquire-balance?CANO=50105802&ACNT_PRDT_CD=02&AFHR_FLPR_YN=N&OFL_YN=&INQR_DVSN=01&UNPR_DVSN=01&FUND_STTL_ICLD_YN=N&FNCG_AMT_AUTO_RDPT_YN=N&PRCS_DVSN=00&CTX_AREA_FK100=&CTX_AREA_NK100=",
+      url: `https://openapivts.koreainvestment.com:29443/uapi/domestic-stock/v1/trading/inquire-balance?CANO=${CANO}&ACNT_PRDT_CD=02&AFHR_FLPR_YN=N&OFL_YN=&INQR_DVSN=01&UNPR_DVSN=01&FUND_STTL_ICLD_YN=N&FNCG_AMT_AUTO_RDPT_YN=N&PRCS_DVSN=00&CTX_AREA_FK100=&CTX_AREA_NK100=`,
       headers: {
         "content-type": "application/json",
-        authorization: `Bearer ${TOKEN}`,
-        appkey: `${APP_KEY}`,
-        appsecret: `${APP_SECRET}`,
-        tr_id: "VTTC8434R",
+        'authorization': `Bearer ${U_TOKEN}`, 
+        'appkey': `${U_APPKEY}`, 
+        'appsecret':  `${U_APPSECRET}`, 
+        'tr_id': 'VTTC8434R'
       },
       // data: data,
     };
-
     const result = axios
       .request(config)
       .then((response) => {
-        console.log(JSON.stringify(response.data.output2));
+        console.log("value:", JSON.stringify(response.data.output2));
         const resp = response.data.output2[0];
         const resBody = {
           dnca_tot_amt: resp.dnca_tot_amt, //총 예수금
