@@ -31,6 +31,18 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.DATEONLY,
         allowNull: true,
       },
+      appKey: {
+        type: Sequelize.TEXT("long"),
+        allowNull: true,
+      },
+      appSecret: {
+        type: Sequelize.TEXT("long"),
+        allowNull: true,
+      },
+      token: {
+        type: Sequelize.TEXT("long"),
+        allowNull: true,
+      },
     },
     {
       // column name : camelCase to snake_case
