@@ -34,7 +34,7 @@ const DROP_IF_EXISTS = { force: true };
 const ALTER_IF_MODIFIED = { alter: true };
 
 db.sequelize
-  .sync(ALTER_IF_MODIFIED) // modify mode here
+  .sync(CREATE_IF_NOT_EXISTS) // modify mode here
   .then(() => {
     console.log(`connected to database`);
   })
