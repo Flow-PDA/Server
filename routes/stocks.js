@@ -419,11 +419,11 @@ router.get(
 );
 //주식 잔고 조회 output1
 router.get(
-  "/:partyKey/:stockKey/balance",
+  "/:partyKey/balance",
   // jwtAuthenticator,
   async (req, res, next) => {
     try {
-      const stockKey = req.params.stockKey;
+      // const stockKey = req.params.stockKey;
       const partyKey = req.params.partyKey;
 
       const CANO = await getPartyAccountNumber(partyKey); // 계좌 앞 8자리
@@ -439,7 +439,6 @@ router.get(
       const CTX_AREA_FK100 = "";
       const CTX_AREA_NK100 = "";
 
-      console.log("code:", stockKey);
       let config = {
         method: "get",
         maxBodyLength: Infinity,
