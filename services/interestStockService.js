@@ -215,6 +215,7 @@ module.exports.getApproval = async (partyKey) => {
           partyKey: partyKey,
         },
       });
+
       const partyMemberKey = partyMemberKeyFind.dataValues.partyMemberKey;
 
       //모임 멤버 중 승인자 수
@@ -294,7 +295,7 @@ module.exports.getApproved = async (partyKey) => {
       const stockName = stockNameFind.dataValues.stockName;
 
       //로그인한 사람이 이 주식을 이미 승인 했는지 안했는지
-      const isApproved = await this.isParticipated(
+      let isApproved = await this.isParticipated(
         partyMemberKey,
         interestStockKey
       );
