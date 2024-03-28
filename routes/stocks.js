@@ -343,7 +343,10 @@ router.post("/inquireDeposit", async (req, res, next) => {
     console.error(err);
   }
 });
+
 // [POST] 주식 매수/매도
+
+
 // VTTC0802U : 주식 현금 매수 주문
 // VTTC0801U : 주식 현금 매도 주문
 router.post("/orderStock", jwtAuthenticator, async (req, res, next) => {
@@ -452,11 +455,11 @@ router.get("/:partyKey/balance", jwtAuthenticator, async (req, res, next) => {
       },
     };
 
+
     const result = await axios
       .request(config)
       .then((response) => {
         const output1 = response.data.output1;
-        console.log(output1);
         // console.log("아웃풋!!!!!", output1);
 
         if (!output1) {
@@ -476,6 +479,7 @@ router.get("/:partyKey/balance", jwtAuthenticator, async (req, res, next) => {
             evlu_erng_rt: data.evlu_erng_rt, // 평가수익률 = 현재 보유 중인 자산의 가치 변동에 따라 발생한 이익 또는 손실
           };
           return resData;
+
         });
         console.log("야야야야야야", resBody);
         return res.status(200).json(resBody);
