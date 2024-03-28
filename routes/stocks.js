@@ -53,9 +53,11 @@ async function fetchNewsData(stock_name) {
         const news_title = $(el).find(".news_tit").text();
         const news_content = $(el).find(".news_dsc").text();
         const news_img = $(el).find(".news_contents img").attr("data-lazysrc");
-        return { news_title, news_content, news_img };
+        const news_link = $(el).find(".news_contents .dsc_thumb").attr("href")
+        return { news_title, news_content, news_img,news_link };
       })
       .get();
+    console.log(result)
     return result;
   } catch (err) {
     console.error(err);
@@ -297,7 +299,7 @@ router.get("/inquire", async (req, res, next) => {
 });
 
 // CANO도 바꿔줘야함!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!진짜 힘드네여...
-// [GET] 잔액 현재가 조회
+// [GET] 현재 잔액 조회
 router.post("/inquireDeposit", async (req, res, next) => {
   try {
     const CANO = req.body.CANO;
