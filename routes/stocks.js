@@ -343,6 +343,7 @@ router.post("/inquireDeposit", async (req, res, next) => {
     console.error(err);
   }
 });
+
 // [GET] 주식 매수/매도
 // VTTC0802U : 주식 현금 매수 주문
 // VTTC0801U : 주식 현금 매도 주문
@@ -420,78 +421,75 @@ router.get(
   }
 );
 //주식 잔고 조회 output1
-router.get(
-  "/:partyKey/balance",
-  jwtAuthenticator,
-  async (req, res, next) => {
-    try {
-      // const stockKey = req.params.stockKey;
-      const partyKey = req.params.partyKey;
-      const partyInfo = await getPartyInfo(partyKey); // 계좌 앞 8자리
-      const CANO = partyInfo.accountNumber;
+router.get("/:partyKey/balance", jwtAuthenticator, async (req, res, next) => {
+  try {
+    // const stockKey = req.params.stockKey;
+    const partyKey = req.params.partyKey;
 
-      console.log("CANO", CANO);
-      const ACNT_PRDT_CD = "01"; // req.body.ACNT_PRDT_CD; //계좌 뒤 2자리 01
-      const AFHR_FLPR_YN = "N";
-      const OFL_YN = "";
-      const INQR_DVSN = "01";
-      const UNPR_DVSN = "01";
-      const FUND_STTL_ICLD_YN = "N";
-      const FNCG_AMT_AUTO_RDPT_YN = "N";
-      const PRCS_DVSN = "00";
-      const CTX_AREA_FK100 = "";
-      const CTX_AREA_NK100 = "";
+    const partyInfo = await getPartyInfo(partyKey); // 계좌 앞 8자리
+    const CANO = partyInfo.accountNumber;
 
-      let config = {
-        method: "get",
-        maxBodyLength: Infinity,
-        url: `https://openapivts.koreainvestment.com:29443/uapi/domestic-stock/v1/trading/inquire-balance?CANO=${CANO}&ACNT_PRDT_CD=${ACNT_PRDT_CD}&AFHR_FLPR_YN=${AFHR_FLPR_YN}&OFL_YN=${OFL_YN}&INQR_DVSN=${INQR_DVSN}&UNPR_DVSN=${UNPR_DVSN}&FUND_STTL_ICLD_YN=${FUND_STTL_ICLD_YN}&FNCG_AMT_AUTO_RDPT_YN=${FNCG_AMT_AUTO_RDPT_YN}&PRCS_DVSN=${PRCS_DVSN}&CTX_AREA_FK100=${CTX_AREA_FK100}&CTX_AREA_NK100=${CTX_AREA_NK100}`,
-        headers: {
-          "content-type": "application/json",
-          authorization: `Bearer ${partyInfo.token}`,
-          appkey: `${partyInfo.appKey}`,
-          appsecret: `${partyInfo.appSecret}`,
-          tr_id: `VTTC8434R`,
-        },
-      };
+    console.log("CANO", CANO);
+    const ACNT_PRDT_CD = "01"; // req.body.ACNT_PRDT_CD; //계좌 뒤 2자리 01
+    const AFHR_FLPR_YN = "N";
+    const OFL_YN = "";
+    const INQR_DVSN = "01";
+    const UNPR_DVSN = "01";
+    const FUND_STTL_ICLD_YN = "N";
+    const FNCG_AMT_AUTO_RDPT_YN = "N";
+    const PRCS_DVSN = "00";
+    const CTX_AREA_FK100 = "";
+    const CTX_AREA_NK100 = "";
 
-      const result = await axios
-        .request(config)
-        .then((response) => {
-          const output1 = response.data.output1;
-          console.log(output1)
-          // console.log("아웃풋!!!!!", output1);
+    let config = {
+      method: "get",
+      maxBodyLength: Infinity,
+      url: `https://openapivts.koreainvestment.com:29443/uapi/domestic-stock/v1/trading/inquire-balance?CANO=${CANO}&ACNT_PRDT_CD=${ACNT_PRDT_CD}&AFHR_FLPR_YN=${AFHR_FLPR_YN}&OFL_YN=${OFL_YN}&INQR_DVSN=${INQR_DVSN}&UNPR_DVSN=${UNPR_DVSN}&FUND_STTL_ICLD_YN=${FUND_STTL_ICLD_YN}&FNCG_AMT_AUTO_RDPT_YN=${FNCG_AMT_AUTO_RDPT_YN}&PRCS_DVSN=${PRCS_DVSN}&CTX_AREA_FK100=${CTX_AREA_FK100}&CTX_AREA_NK100=${CTX_AREA_NK100}`,
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${partyInfo.token}`,
+        appkey: `${partyInfo.appKey}`,
+        appsecret: `${partyInfo.appSecret}`,
+        tr_id: `VTTC8434R`,
+      },
+    };
 
-          if (!output1) {
-            throw new Error("Output1 is undefined in API response");
-          }
-          const resBody = output1.map((data) => {
-            const resData = {
-              pdno: data.pdno, // 주식코드
-              prdt_name: data.prdt_name, //주식이름
-              prpr: data.prpr, // 현재가
-              hldg_qty: data.hldg_qty, // 보유수량
-              pchs_avg_pric: data.pchs_avg_pric, // 평단가
-              pchs_amt: data.pchs_amt, // 매입금액
-              evlu_amt: data.evlu_amt, // 평가금액
-              evlu_pfls_amt: data.evlu_pfls_amt, //평가손익금액 = 평가금액-매입금액
-              evlu_pfls_rt: data.evlu_pfls_rt, // 평가손익율 (%) =특정 시점에서 주식을 매도하여 실현된 손익 또는 이익
-              evlu_erng_rt: data.evlu_erng_rt, // 평가수익률 = 현재 보유 중인 자산의 가치 변동에 따라 발생한 이익 또는 손실
-            };
-            return resData;
-          });
-          console.log("야야야야야야", resBody);
-          return res.status(200).json(resBody);
-        })
-        .catch((error) => {
-          console.log(error);
-          return res.status(500).json({ error: "Internal server error" });
+    const result = await axios
+      .request(config)
+      .then((response) => {
+        const output1 = response.data.output1;
+        // console.log("아웃풋!!!!!", output1);
+
+        if (!output1) {
+          throw new Error("Output1 is undefined in API response");
+        }
+        const resBody = output1.map((data) => {
+          const resData = {
+            pdno: data.pdno, // 주식코드
+            prdt_name: data.prdt_name, //주식이름
+            prpr: data.prpr, // 현재가
+            hldg_qty: data.hldg_qty, // 보유수량
+            pchs_avg_pric: data.pchs_avg_pric, // 평단가
+            pchs_amt: data.pchs_amt, // 매입금액
+            evlu_amt: data.evlu_amt, // 평가금액
+            evlu_pfls_amt: data.evlu_pfls_amt, //평가손익금액 = 평가금액-매입금액
+            evlu_pfls_rt: data.evlu_pfls_rt, // 평가손익율 (%) =특정 시점에서 주식을 매도하여 실현된 손익 또는 이익
+            evlu_erng_rt: data.evlu_erng_rt, // 평가수익률 = 현재 보유 중인 자산의 가치 변동에 따라 발생한 이익 또는 손실
+          };
+          return resData;
+
         });
-    } catch (err) {
-      console.error(err);
-      return res.status(500).json({ error: "Internal server error" });
-    }
+        console.log("야야야야야야", resBody);
+        return res.status(200).json(resBody);
+      })
+      .catch((error) => {
+        console.log(error);
+        return res.status(500).json({ error: "Internal server error" });
+      });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Internal server error" });
   }
-);
+});
 
 module.exports = router;
