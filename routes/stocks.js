@@ -310,9 +310,6 @@ router.post("/inquireDeposit", async (req, res, next) => {
     const U_APPSECRET = req.body.APPSECRET;
     const U_TOKEN = req.body.TOKEN;
 
-    console.log("CANO", CANO);
-    console.log("U_TOKEN", U_TOKEN);
-
     let config = {
       method: "get",
       maxBodyLength: Infinity,
@@ -386,7 +383,7 @@ router.post("/orderStock", jwtAuthenticator, async (req, res, next) => {
     const result = axios
       .request(config)
       .then((response) => {
-        console.log(JSON.stringify(response.data));
+        // console.log(JSON.stringify(response.data));
         const resp = response.data.output;
         return res
           .status(201)
@@ -425,12 +422,11 @@ router.get(
 //주식 잔고 조회 output1
 router.get(
   "/:partyKey/balance",
-  // jwtAuthenticator,
+  jwtAuthenticator,
   async (req, res, next) => {
     try {
       // const stockKey = req.params.stockKey;
       const partyKey = req.params.partyKey;
-
       const partyInfo = await getPartyInfo(partyKey); // 계좌 앞 8자리
       const CANO = partyInfo.accountNumber;
 
@@ -463,6 +459,7 @@ router.get(
         .request(config)
         .then((response) => {
           const output1 = response.data.output1;
+          console.log(output1)
           // console.log("아웃풋!!!!!", output1);
 
           if (!output1) {

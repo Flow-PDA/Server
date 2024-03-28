@@ -101,17 +101,28 @@ router.get("/", jwtAuthenticator, async (req, res, next) => {
     return res.status(500).json({ msg: "ERROR MESSAGE" });
   }
 });
-
+// [GET] user 속한 파티
+router.get("/user", jwtAuthenticator, async(req,res,next)=>{
+  try{
+    const key = req.jwt.payload
+    console.log("key",key)
+    return res.status(200).json(key)
+  }catch(err){
+    console.error(err)
+  }
+})
 // [GET] 특정 모임 조회하기
 router.get("/:partyKey", jwtAuthenticator, async (req, res, next) => {
   try {
     const result = await Party.findOne({
       where: { party_key: req.params.partyKey },
     });
+    const key = req.jwt
     const resBody = {
       msg: "특정 모임 조회 결과",
       result: result,
     };
+    
 
     return res.status(200).json(resBody);
   } catch (err) {
