@@ -43,6 +43,9 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.TEXT("long"),
         allowNull: true,
       },
+      transferSum: {
+        type: Sequelize.BIGINT,
+      },
     },
     {
       // column name : camelCase to snake_case
