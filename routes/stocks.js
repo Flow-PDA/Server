@@ -56,11 +56,11 @@ async function fetchNewsData(stock_name) {
         const news_title = $(el).find(".news_tit").text();
         const news_content = $(el).find(".news_dsc").text();
         const news_img = $(el).find(".news_contents img").attr("data-lazysrc");
-        const news_link = $(el).find(".news_contents .dsc_thumb").attr("href")
-        return { news_title, news_content, news_img,news_link };
+        const news_link = $(el).find(".news_contents .dsc_thumb").attr("href");
+        return { news_title, news_content, news_img, news_link };
       })
       .get();
-    console.log(result)
+    console.log(result);
     return result;
   } catch (err) {
     console.error(err);
@@ -434,7 +434,7 @@ router.get(
       const partyInfo = await getPartyInfo(partyKey); // 계좌 앞 8자리
       const CANO = partyInfo.accountNumber;
 
-      // console.log("CANO", CANO);
+      console.log("CANO", CANO);
       const ACNT_PRDT_CD = "01"; // req.body.ACNT_PRDT_CD; //계좌 뒤 2자리 01
       const AFHR_FLPR_YN = "N";
       const OFL_YN = "";

@@ -215,7 +215,7 @@ module.exports.getApproval = async (partyKey) => {
           partyKey: partyKey,
         },
       });
-
+      
       const partyMemberKey = partyMemberKeyFind.dataValues.partyMemberKey;
 
       //모임 멤버 중 승인자 수
