@@ -7,8 +7,10 @@ const dotenv = require("dotenv");
 const { jwtAuthenticator } = require("../middlewares/authenticator.js");
 
 const stockService = require("../services/stockService.js");
-const { getPartyAccountNumber } = require("../services/partyService.js");
-
+// eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9
+//   .eyJzdWIiOiJ0b2tlbiIsImF1ZCI6IjNlYzVkZWJhLTBkNzUtNGE5NC1hODc4LWI1YzEyNzJhNTc5YiIsImlzcyI6InVub2d3IiwiZXhwIjoxNzExNjcxNDEyLCJpYXQiOjE3MTE1ODUwMTIsImp0aSI6IlBTV2FXZnplbTBoM3lsVlprNEdOTXllMkxzc0FtU2lNSlVMZCJ9
+//   .mwxBCNJiZgzmDd1Cxt7Wx66qcde6SvpiZzeQ162_H_h5hpYgvY9Pd -
+//   gqSluTLL_ppg7rFnm5WLoXHqVLxlKlwQ;
 dotenv.config();
 
 const APP_KEY = process.env.APP_KEY;
@@ -18,6 +20,7 @@ const TOKEN = process.env.TOKEN;
 
 const API_KEY = process.env.API_KEY;
 const { db } = require("../modules");
+const { getPartyInfo } = require("../services/partyService.js");
 const Stock = db.Stocks;
 
 let hankookConfig = {
@@ -314,10 +317,10 @@ router.post("/inquireDeposit", async (req, res, next) => {
       url: `https://openapivts.koreainvestment.com:29443/uapi/domestic-stock/v1/trading/inquire-balance?CANO=${CANO}&ACNT_PRDT_CD=02&AFHR_FLPR_YN=N&OFL_YN=&INQR_DVSN=01&UNPR_DVSN=01&FUND_STTL_ICLD_YN=N&FNCG_AMT_AUTO_RDPT_YN=N&PRCS_DVSN=00&CTX_AREA_FK100=&CTX_AREA_NK100=`,
       headers: {
         "content-type": "application/json",
-        'authorization': `Bearer ${U_TOKEN}`, 
-        'appkey': `${U_APPKEY}`, 
-        'appsecret':  `${U_APPSECRET}`, 
-        'tr_id': 'VTTC8434R'
+        authorization: `Bearer ${U_TOKEN}`,
+        appkey: `${U_APPKEY}`,
+        appsecret: `${U_APPSECRET}`,
+        tr_id: "VTTC8434R",
       },
       // data: data,
     };
@@ -426,7 +429,9 @@ router.get(
       // const stockKey = req.params.stockKey;
       const partyKey = req.params.partyKey;
 
-      const CANO = await getPartyAccountNumber(partyKey); // 계좌 앞 8자리
+      const partyInfo = await getPartyInfo(partyKey); // 계좌 앞 8자리
+      const CANO = partyInfo.accountNumber;
+
       // console.log("CANO", CANO);
       const ACNT_PRDT_CD = "01"; // req.body.ACNT_PRDT_CD; //계좌 뒤 2자리 01
       const AFHR_FLPR_YN = "N";
@@ -445,9 +450,9 @@ router.get(
         url: `https://openapivts.koreainvestment.com:29443/uapi/domestic-stock/v1/trading/inquire-balance?CANO=${CANO}&ACNT_PRDT_CD=${ACNT_PRDT_CD}&AFHR_FLPR_YN=${AFHR_FLPR_YN}&OFL_YN=${OFL_YN}&INQR_DVSN=${INQR_DVSN}&UNPR_DVSN=${UNPR_DVSN}&FUND_STTL_ICLD_YN=${FUND_STTL_ICLD_YN}&FNCG_AMT_AUTO_RDPT_YN=${FNCG_AMT_AUTO_RDPT_YN}&PRCS_DVSN=${PRCS_DVSN}&CTX_AREA_FK100=${CTX_AREA_FK100}&CTX_AREA_NK100=${CTX_AREA_NK100}`,
         headers: {
           "content-type": "application/json",
-          authorization: `Bearer ${TOKEN}`,
-          appkey: `${APP_KEY}`,
-          appsecret: `${APP_SECRET}`,
+          authorization: `Bearer ${partyInfo.token}`,
+          appkey: `${partyInfo.appKey}`,
+          appsecret: `${partyInfo.appSecret}`,
           tr_id: `VTTC8434R`,
         },
       };
