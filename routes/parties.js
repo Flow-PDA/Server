@@ -189,7 +189,24 @@ router.get("/:partyKey/members", jwtAuthenticator, async (req, res, next) => {
     return res.status(500).json({ msg: "ERROR MESSAGE" });
   }
 });
+// [GET] 유저가 속한 파티 조회
+router.get("/:userKey/user", jwtAuthenticator, async (req, res, next) => {
+  try {
+    const userKey = req.params.userKey;
+    const result = await PartyMember.findAll({
+      where: { user_key: userKey },
+    });
 
+    const resBody = {
+      msg: "특정 모임에 속한 모임원 조회",
+      result: result,
+    };
+    return res.status(200).json(resBody);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ msg: "ERROR MESSAGE" });
+  }
+});
 // [POST] 특정 모임에 일반 멤버 추가
 router.post("/:partyKey/members", jwtAuthenticator, async (req, res, next) => {
   try {
