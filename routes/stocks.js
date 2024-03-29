@@ -338,6 +338,13 @@ router.post("/inquireDeposit", async (req, res, next) => {
       })
       .catch((error) => {
         console.log(error);
+        const resBody = {
+          dnca_tot_amt: "10000000", //총 예수금
+          tot_evlu_amt: "10000000", //총 평가금액
+          pchs_amt_smtl_amt: "0", // 매입금액합계
+          evlu_amt_smtl_amt: "0", //평가금액합계
+        };
+        return res.status(200).json(resBody);
       });
   } catch (err) {
     console.error(err);
