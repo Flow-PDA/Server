@@ -352,8 +352,6 @@ router.post("/inquireDeposit", async (req, res, next) => {
 });
 
 // [POST] 주식 매수/매도
-
-
 // VTTC0802U : 주식 현금 매수 주문
 // VTTC0801U : 주식 현금 매도 주문
 router.post("/orderStock", jwtAuthenticator, async (req, res, next) => {
@@ -366,6 +364,14 @@ router.post("/orderStock", jwtAuthenticator, async (req, res, next) => {
     const ORD_QTY = req.body.ORD_QTY; // 주문수량
     const ORD_UNPR = req.body.ORD_UNPR; //주문단가
 
+    const partyKey = req.body.partyKey;
+    const stockKey = req.body.stockKey;
+    let transactionType = 0;
+
+    if (tr_id === "VTTC0801U") {
+      transactionType = "1";
+    }
+
     let data = JSON.stringify({
       CANO: `${CANO}`,
       ACNT_PRDT_CD: `${ACNT_PRDT_CD}`,
@@ -375,15 +381,20 @@ router.post("/orderStock", jwtAuthenticator, async (req, res, next) => {
       ORD_UNPR: `${ORD_UNPR}`,
     });
 
+    const partyInfo = await getPartyInfo(partyKey).then(
+      (res) => res.dataValues
+    );
+    // console.log("partyInfo", partyInfo);
+
     let config = {
       method: "post",
       maxBodyLength: Infinity,
       url: "https://openapivts.koreainvestment.com:29443/uapi/domestic-stock/v1/trading/order-cash",
       headers: {
         "content-type": "application/json",
-        authorization: `Bearer ${TOKEN}`,
-        appkey: `${APP_KEY}`,
-        appsecret: `${APP_SECRET}`,
+        authorization: `Bearer ${partyInfo.token}`,
+        appkey: `${partyInfo.appKey}`,
+        appsecret: `${partyInfo.appSecret}`,
         tr_id: `${tr_id}`,
         hashkey: "",
       },
@@ -392,15 +403,38 @@ router.post("/orderStock", jwtAuthenticator, async (req, res, next) => {
 
     const result = axios
       .request(config)
-      .then((response) => {
-        // console.log(JSON.stringify(response.data));
+      .then(async (response) => {
+        const msg_cd = response.data.msg_cd;
+        const msg1 = response.data.msg1;
+
+        if (msg_cd === "40580000") {
+          console.log(response.data.msg1);
+          return res.status(503).json({ msg_cd: msg_cd, msg1: msg1 });
+        }
+
         const resp = response.data.output;
+
+        if (resp) {
+          //transaction_detail 추가
+          const transaction = await stockService.transact({
+            userKey: req.jwt.payload.key,
+            partyKey: partyKey,
+            stockKey: stockKey,
+            price: ORD_UNPR,
+            volume: ORD_QTY,
+            transactionType: transactionType,
+          });
+
+          console.log("트랜잭션(주식 거래) 추가", transaction);
+        }
+
         return res
           .status(201)
           .json({ msg: `${resp.ORD_TMD}에 주문이 완료되었습니다.` });
       })
       .catch((error) => {
         console.log(error);
+        throw Error(error);
       });
   } catch (err) {
     console.error(err);
@@ -462,7 +496,6 @@ router.get("/:partyKey/balance", jwtAuthenticator, async (req, res, next) => {
       },
     };
 
-
     const result = await axios
       .request(config)
       .then((response) => {
@@ -486,7 +519,6 @@ router.get("/:partyKey/balance", jwtAuthenticator, async (req, res, next) => {
             evlu_erng_rt: data.evlu_erng_rt, // 평가수익률 = 현재 보유 중인 자산의 가치 변동에 따라 발생한 이익 또는 손실
           };
           return resData;
-
         });
         console.log("야야야야야야", resBody);
         return res.status(200).json(resBody);

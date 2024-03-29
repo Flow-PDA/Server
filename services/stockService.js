@@ -82,3 +82,19 @@ module.exports.getStockInfo = async (stockKey) => {
     console.error(error);
   }
 };
+
+/**
+ * 주식 매수/매도 시 trancsaction Detail 추가
+ * create transactionDetail
+ * @param {*} transactionDto userKey, partyKey, stockKey, price, volume, transaction_type
+ * @returns created TransactionDetail info
+ */
+
+module.exports.transact = async (transactionDto) => {
+  try {
+    const res = await TransactionDetail.create(transactionDto);
+    return res.dataValues;
+  } catch (error) {
+    console.log(error);
+  }
+};
