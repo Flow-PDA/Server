@@ -377,7 +377,7 @@ router.post("/orderStock", jwtAuthenticator, async (req, res, next) => {
     const partyInfo = await getPartyInfo(partyKey).then(
       (res) => res.dataValues
     );
-    console.log("partyInfo", partyInfo);
+    // console.log("partyInfo", partyInfo);
 
     let config = {
       method: "post",
