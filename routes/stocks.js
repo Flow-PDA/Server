@@ -71,7 +71,7 @@ async function fetchNewsData(stock_name) {
 router.get("/news", jwtAuthenticator, async (req, res, next) => {
   try {
     const stock_name = req.query.stock_name;
-    console.log(stock_name);
+    // console.log(stock_name);
     const response = await fetchNewsData(stock_name);
     return res.status(200).json(response);
   } catch (err) {
@@ -191,7 +191,7 @@ router.get("/hotIssue", async (req, res, next) => {
   try {
     // tag 타입 지정
     const tag = req.query.tag;
-    console.log(tag);
+    // console.log(tag);
     let config = {
       method: "get",
       maxBodyLength: Infinity,
@@ -204,7 +204,7 @@ router.get("/hotIssue", async (req, res, next) => {
     const result = axios
       .request(config)
       .then((response) => {
-        console.log(response.data.dataBody);
+        // console.log(response.data.dataBody);
         return res.status(200).json(response.data.dataBody);
       })
       .catch((error) => {
@@ -219,7 +219,7 @@ router.get("/hotIssue", async (req, res, next) => {
 router.get("/inquired", async (req, res, next) => {
   try {
     stock_code = req.query.stock_code;
-    console.log("code:", stock_code);
+    // console.log("code:", stock_code);
     let config = {
       method: "get",
       maxBodyLength: Infinity,
@@ -288,9 +288,11 @@ router.get("/inquire", async (req, res, next) => {
           prdy_vrss_sign: resp.prdy_vrss_sign,
           prdy_ctrt: resp.prdy_ctrt,
           stck_prpr: resp.stck_prpr,
+          stck_oprc: resp.stck_oprc, //주식 시가
+
           stockName: stock_name,
         };
-        console.log(resBody);
+        // console.log(resBody);
         return res.status(200).json(resBody);
       })
       .catch((error) => {
@@ -326,7 +328,7 @@ router.post("/inquireDeposit", async (req, res, next) => {
     const result = axios
       .request(config)
       .then((response) => {
-        console.log("value:", JSON.stringify(response.data.output2));
+        // console.log("value:", JSON.stringify(response.data.output2));
         const resp = response.data.output2[0];
         const resBody = {
           dnca_tot_amt: resp.dnca_tot_amt, //총 예수금
@@ -345,7 +347,6 @@ router.post("/inquireDeposit", async (req, res, next) => {
 });
 
 // [POST] 주식 매수/매도
-
 
 // VTTC0802U : 주식 현금 매수 주문
 // VTTC0801U : 주식 현금 매도 주문
@@ -430,7 +431,7 @@ router.get("/:partyKey/balance", jwtAuthenticator, async (req, res, next) => {
     const partyInfo = await getPartyInfo(partyKey); // 계좌 앞 8자리
     const CANO = partyInfo.accountNumber;
 
-    console.log("CANO", CANO);
+    // console.log("CANO", CANO);
     const ACNT_PRDT_CD = "01"; // req.body.ACNT_PRDT_CD; //계좌 뒤 2자리 01
     const AFHR_FLPR_YN = "N";
     const OFL_YN = "";
@@ -455,7 +456,6 @@ router.get("/:partyKey/balance", jwtAuthenticator, async (req, res, next) => {
       },
     };
 
-
     const result = await axios
       .request(config)
       .then((response) => {
@@ -479,9 +479,8 @@ router.get("/:partyKey/balance", jwtAuthenticator, async (req, res, next) => {
             evlu_erng_rt: data.evlu_erng_rt, // 평가수익률 = 현재 보유 중인 자산의 가치 변동에 따라 발생한 이익 또는 손실
           };
           return resData;
-
         });
-        console.log("야야야야야야", resBody);
+        // console.log("야야야야야야", resBody);
         return res.status(200).json(resBody);
       })
       .catch((error) => {
@@ -493,5 +492,54 @@ router.get("/:partyKey/balance", jwtAuthenticator, async (req, res, next) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 });
+
+//주식 전일 종가 가져오기
+router.get(
+  "/stockInfo/:stockKey/endPrice",
+  jwtAuthenticator,
+  async (req, res, next) => {
+    const axios = require("axios");
+
+    function getYesterdayDate() {
+      const today = new Date();
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      yesterday.setHours(0, 0, 0, 0); // 시간을 00:00:00으로 설정
+      return yesterday;
+    }
+
+    // 어제 날짜를 YYYYMMDD 형식의 문자열로 변환하는 함수
+    function formatDate(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}${month}${day}0000`; //시간 0000으로 설정
+    }
+
+    const yesterday = getYesterdayDate();
+    const dateTime = formatDate(yesterday);
+
+    const stockCode = req.params.stockKey;
+
+    let config = {
+      method: "get",
+      maxBodyLength: Infinity,
+
+      url: `https://api.stock.naver.com/chart/domestic/item/${stockCode}/day?startDateTime=${dateTime}&endDateTime=${dateTime}`,
+      headers: {},
+    };
+
+    axios
+      .request(config)
+      .then((response) => {
+        console.log(JSON.stringify(response.data));
+
+        return res.status(200).json(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+);
 
 module.exports = router;
