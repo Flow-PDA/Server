@@ -49,7 +49,7 @@ pipeline {
     stage('deploy') {
       steps {
         echo 'run docker container'
-        sh 'docker-compose -p deploy up -d'
+        sh 'docker-compose -p deploy -f docker-compose-express.yml up -d'
       }
     }
   }
