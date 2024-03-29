@@ -26,6 +26,7 @@ module.exports.transfer = async (TransferDetailDto) => {
   // 파티의 예수금에서 이체 금액을 빼고 저장
 
   party.deposit -= TransferDetailDto.price;
+  party.transferSum -= TransferDetailDto.price;
   console.log(party.deposit);
   await party.save();
 

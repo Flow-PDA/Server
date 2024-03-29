@@ -310,9 +310,6 @@ router.post("/inquireDeposit", async (req, res, next) => {
     const U_APPSECRET = req.body.APPSECRET;
     const U_TOKEN = req.body.TOKEN;
 
-    console.log("CANO", CANO);
-    console.log("U_TOKEN", U_TOKEN);
-
     let config = {
       method: "get",
       maxBodyLength: Infinity,
@@ -347,7 +344,9 @@ router.post("/inquireDeposit", async (req, res, next) => {
   }
 });
 
-// [GET] 주식 매수/매도
+// [POST] 주식 매수/매도
+
+
 // VTTC0802U : 주식 현금 매수 주문
 // VTTC0801U : 주식 현금 매도 주문
 router.post("/orderStock", jwtAuthenticator, async (req, res, next) => {
@@ -464,7 +463,6 @@ router.get("/:partyKey/balance", jwtAuthenticator, async (req, res, next) => {
   try {
     // const stockKey = req.params.stockKey;
     const partyKey = req.params.partyKey;
-
     const partyInfo = await getPartyInfo(partyKey); // 계좌 앞 8자리
     const CANO = partyInfo.accountNumber;
 
@@ -493,6 +491,7 @@ router.get("/:partyKey/balance", jwtAuthenticator, async (req, res, next) => {
       },
     };
 
+
     const result = await axios
       .request(config)
       .then((response) => {
@@ -516,6 +515,7 @@ router.get("/:partyKey/balance", jwtAuthenticator, async (req, res, next) => {
             evlu_erng_rt: data.evlu_erng_rt, // 평가수익률 = 현재 보유 중인 자산의 가치 변동에 따라 발생한 이익 또는 손실
           };
           return resData;
+
         });
         console.log("야야야야야야", resBody);
         return res.status(200).json(resBody);
