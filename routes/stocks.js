@@ -5,6 +5,8 @@ const cheerio = require("cheerio");
 const iconv = require("iconv-lite");
 const dotenv = require("dotenv");
 const { jwtAuthenticator } = require("../middlewares/authenticator.js");
+const { db } = require("../modules");
+const Parties = db.Parties;
 
 const stockService = require("../services/stockService.js");
 // eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9
@@ -19,7 +21,7 @@ const TR_ID = process.env.TR_ID;
 const TOKEN = process.env.TOKEN;
 
 const API_KEY = process.env.API_KEY;
-const { db } = require("../modules");
+
 const { getPartyInfo } = require("../services/partyService.js");
 const Stock = db.Stocks;
 
@@ -370,6 +372,12 @@ router.post("/orderStock", jwtAuthenticator, async (req, res, next) => {
     const stockKey = req.body.stockKey;
     let transactionType = 0;
 
+    const party = await Parties.findOne({
+      where: {
+        partyKey: partyKey,
+      },
+    });
+
     if (tr_id === "VTTC0801U") {
       transactionType = "1";
     }
@@ -386,7 +394,6 @@ router.post("/orderStock", jwtAuthenticator, async (req, res, next) => {
     const partyInfo = await getPartyInfo(partyKey).then(
       (res) => res.dataValues
     );
-
 
     let config = {
       method: "post",
@@ -428,6 +435,33 @@ router.post("/orderStock", jwtAuthenticator, async (req, res, next) => {
           });
 
           console.log("트랜잭션(주식 거래) 추가", transaction);
+
+          //TODO 예수금 잘 바뀌는지 확인 필요
+          //파티의 예수금 업데이트
+          let config2 = {
+            method: "get",
+            maxBodyLength: Infinity,
+            url: `https://openapivts.koreainvestment.com:29443/uapi/domestic-stock/v1/trading/inquire-balance?CANO=${CANO}&ACNT_PRDT_CD=02&AFHR_FLPR_YN=N&OFL_YN=&INQR_DVSN=01&UNPR_DVSN=01&FUND_STTL_ICLD_YN=N&FNCG_AMT_AUTO_RDPT_YN=N&PRCS_DVSN=00&CTX_AREA_FK100=&CTX_AREA_NK100=`,
+            headers: {
+              "content-type": "application/json",
+              authorization: `Bearer ${U_TOKEN}`,
+              appkey: `${U_APPKEY}`,
+              appsecret: `${U_APPSECRET}`,
+              tr_id: "VTTC8434R",
+            },
+            // data: data,
+          };
+
+          const total_deposit = await axios
+            .request(config2)
+            .then((response) => {
+              const resp = response.data.output2[0];
+              return resp.dnca_tot_amt; // 총 예수금
+            });
+
+          // 총 예수금을 받아온 후에 파티의 deposit 수정
+          party.deposit = party.transferSum + total_deposit;
+          await party.save();
         }
 
         return res
@@ -560,6 +594,7 @@ router.get(
 
     const yesterday = getYesterdayDate();
     const dateTime = formatDate(yesterday);
+    console.log(dateTime);
 
     const stockCode = req.params.stockKey;
 
@@ -574,7 +609,7 @@ router.get(
     axios
       .request(config)
       .then((response) => {
-        console.log(JSON.stringify(response.data));
+        console.log("전일 종가", JSON.stringify(response.data));
 
         return res.status(200).json(response.data);
       })
