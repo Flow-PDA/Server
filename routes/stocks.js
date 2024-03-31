@@ -58,7 +58,7 @@ async function fetchNewsData(stock_name) {
         return { news_title, news_content, news_img, news_link };
       })
       .get();
-    console.log(result);
+    // console.log(result);
     return result;
   } catch (err) {
     console.error(err);
@@ -229,7 +229,6 @@ router.get("/inquired", async (req, res, next) => {
       prdy_ctrt: resp.prdy_ctrt,
       stck_prpr: resp.stck_prpr,
     };
-
     return res.status(200).json(resBody);
 
   } catch (err) {
@@ -379,7 +378,7 @@ router.post("/orderStock", jwtAuthenticator, async (req, res, next) => {
         const msg1 = response.data.msg1;
 
         if (msg_cd === "40580000") {
-          console.log(response.data.msg1);
+          // console.log(response.data.msg1);
           return res.status(503).json({ msg_cd: msg_cd, msg1: msg1 });
         }
 
@@ -396,7 +395,7 @@ router.post("/orderStock", jwtAuthenticator, async (req, res, next) => {
             transactionType: transactionType,
           });
 
-          console.log("트랜잭션(주식 거래) 추가", transaction);
+          // console.log("트랜잭션(주식 거래) 추가", transaction);
 
           //TODO 예수금 잘 바뀌는지 확인 필요
           //파티의 예수금 업데이트
@@ -538,12 +537,24 @@ router.get(
   async (req, res, next) => {
     const axios = require("axios");
 
-    function getYesterdayDate() {
+    function getPreviousBusinessDay() {
       const today = new Date();
-      const yesterday = new Date(today);
-      yesterday.setDate(yesterday.getDate() - 1);
-      yesterday.setHours(0, 0, 0, 0); // 시간을 00:00:00으로 설정
-      return yesterday;
+      let previousDay = new Date(today);
+
+      // If today is Sunday (0) or Monday (1), set previousDay to Friday (5)
+      const dayOfWeek = today.getDay();
+      if (dayOfWeek === 0) {
+        // Sunday
+        previousDay.setDate(today.getDate() - 2); // Set to Friday
+      } else if (dayOfWeek === 1) {
+        // Monday
+        previousDay.setDate(today.getDate() - 3); // Set to Friday
+      } else {
+        previousDay.setDate(today.getDate() - 1); // Set to previous day
+      }
+
+      previousDay.setHours(0, 0, 0, 0); // Set time to 00:00:00
+      return previousDay;
     }
 
     // 어제 날짜를 YYYYMMDD 형식의 문자열로 변환하는 함수
@@ -554,9 +565,9 @@ router.get(
       return `${year}${month}${day}0000`; //시간 0000으로 설정
     }
 
-    const yesterday = getYesterdayDate();
-    const dateTime = formatDate(yesterday);
-    console.log(dateTime);
+    const previousBusinessDay = getPreviousBusinessDay();
+    const dateTime = formatDate(previousBusinessDay);
+    // console.log(dateTime);
 
     const stockCode = req.params.stockKey;
 
@@ -571,7 +582,7 @@ router.get(
     axios
       .request(config)
       .then((response) => {
-        console.log("전일 종가", JSON.stringify(response.data));
+        // console.log("전일 종가", JSON.stringify(response.data));
 
         return res.status(200).json(response.data);
       })
