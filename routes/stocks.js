@@ -5,12 +5,10 @@ const cheerio = require("cheerio");
 const iconv = require("iconv-lite");
 const dotenv = require("dotenv");
 const { jwtAuthenticator } = require("../middlewares/authenticator.js");
+const { db, kisApi } = require("../modules");
+const Parties = db.Parties;
 
 const stockService = require("../services/stockService.js");
-// eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9
-//   .eyJzdWIiOiJ0b2tlbiIsImF1ZCI6IjNlYzVkZWJhLTBkNzUtNGE5NC1hODc4LWI1YzEyNzJhNTc5YiIsImlzcyI6InVub2d3IiwiZXhwIjoxNzExNjcxNDEyLCJpYXQiOjE3MTE1ODUwMTIsImp0aSI6IlBTV2FXZnplbTBoM3lsVlprNEdOTXllMkxzc0FtU2lNSlVMZCJ9
-//   .mwxBCNJiZgzmDd1Cxt7Wx66qcde6SvpiZzeQ162_H_h5hpYgvY9Pd -
-//   gqSluTLL_ppg7rFnm5WLoXHqVLxlKlwQ;
 dotenv.config();
 
 const APP_KEY = process.env.APP_KEY;
@@ -19,23 +17,23 @@ const TR_ID = process.env.TR_ID;
 const TOKEN = process.env.TOKEN;
 
 const API_KEY = process.env.API_KEY;
-const { db } = require("../modules");
+
 const { getPartyInfo } = require("../services/partyService.js");
 const Stock = db.Stocks;
 
-let hankookConfig = {
-  method: "get",
-  maxBodyLength: Infinity,
-  url: "https://openapivts.koreainvestment.com:29443/uapi/domestic-stock/v1/trading/inquire-balance?CANO=${CANO}&ACNT_PRDT_CD=02&AFHR_FLPR_YN=N&OFL_YN=&INQR_DVSN=01&UNPR_DVSN=01&FUND_STTL_ICLD_YN=N&FNCG_AMT_AUTO_RDPT_YN=N&PRCS_DVSN=00&CTX_AREA_FK100=&CTX_AREA_NK100=",
-  headers: {
-    "content-type": "application/json",
-    authorization: `Bearer ${TOKEN}`,
-    appkey: `${APP_KEY}`,
-    appsecret: `${APP_SECRET}`,
-    tr_id: `${TR_ID}`,
-  },
-  // data: data,
-};
+// let hankookConfig = {
+//   method: "get",
+//   maxBodyLength: Infinity,
+//   url: "https://openapivts.koreainvestment.com:29443/uapi/domestic-stock/v1/trading/inquire-balance?CANO=${CANO}&ACNT_PRDT_CD=02&AFHR_FLPR_YN=N&OFL_YN=&INQR_DVSN=01&UNPR_DVSN=01&FUND_STTL_ICLD_YN=N&FNCG_AMT_AUTO_RDPT_YN=N&PRCS_DVSN=00&CTX_AREA_FK100=&CTX_AREA_NK100=",
+//   headers: {
+//     "content-type": "application/json",
+//     authorization: `Bearer ${TOKEN}`,
+//     appkey: `${APP_KEY}`,
+//     appsecret: `${APP_SECRET}`,
+//     tr_id: `${TR_ID}`,
+//   },
+//   // data: data,
+// };
 // 네이버 뉴스 크롤링
 async function fetchNewsData(stock_name) {
   try {
@@ -60,7 +58,7 @@ async function fetchNewsData(stock_name) {
         return { news_title, news_content, news_img, news_link };
       })
       .get();
-    console.log(result);
+    // console.log(result);
     return result;
   } catch (err) {
     console.error(err);
@@ -220,36 +218,19 @@ router.get("/inquired", async (req, res, next) => {
   try {
     stock_code = req.query.stock_code;
     // console.log("code:", stock_code);
-    let config = {
-      method: "get",
-      maxBodyLength: Infinity,
-      url: `https://openapivts.koreainvestment.com:29443/uapi/domestic-stock/v1/quotations/inquire-price?fid_cond_mrkt_div_code=J&fid_input_iscd=${stock_code}`,
-      headers: {
-        "content-type": "application/json",
-        authorization: `Bearer ${TOKEN}`,
-        appkey: `${APP_KEY}`,
-        appsecret: `${APP_SECRET}`,
-        tr_id: `FHKST01010100`,
-      },
-      // data: data,
+
+    console.log(kisApi);
+    const response = await kisApi.instance.get(`inquire-price?fid_cond_mrkt_div_code=J&fid_input_iscd=${stock_code}`);
+
+    const resp = response.data.output;
+    const resBody = {
+      prdy_vrss: resp.prdy_vrss,
+      prdy_vrss_sign: resp.prdy_vrss_sign,
+      prdy_ctrt: resp.prdy_ctrt,
+      stck_prpr: resp.stck_prpr,
     };
-    const result = axios
-      .request(config)
-      .then((response) => {
-        // console.log(JSON.stringify(response.data));
-        const resp = response.data.output;
-        const resBody = {
-          prdy_vrss: resp.prdy_vrss,
-          prdy_vrss_sign: resp.prdy_vrss_sign,
-          prdy_ctrt: resp.prdy_ctrt,
-          stck_prpr: resp.stck_prpr,
-        };
-        console.log(resBody);
-        return res.status(200).json(resBody);
-      })
-      .catch((error) => {
-        // console.log(error);
-      });
+    return res.status(200).json(resBody);
+
   } catch (err) {
     console.error(err);
   }
@@ -264,40 +245,22 @@ router.get("/inquire", async (req, res, next) => {
 
     const stock_name = resBody.dataValues.stockName;
 
-    let config = {
-      method: "get",
-      maxBodyLength: Infinity,
-      url: `https://openapivts.koreainvestment.com:29443/uapi/domestic-stock/v1/quotations/inquire-price?fid_cond_mrkt_div_code=J&fid_input_iscd=${stock_code}`,
-      headers: {
-        "content-type": "application/json",
-        authorization: `Bearer ${TOKEN}`,
-        appkey: `${APP_KEY}`,
-        appsecret: `${APP_SECRET}`,
-        tr_id: `FHKST01010100`,
-      },
-      // data: data,
+    const response = await kisApi.instance.get(`inquire-price?fid_cond_mrkt_div_code=J&fid_input_iscd=${stock_code}`);
+
+    console.log(response);
+    const resp = response.data.output;
+    const respBody = {
+      prdy_vrss: resp.prdy_vrss,
+      prdy_vrss_sign: resp.prdy_vrss_sign,
+      prdy_ctrt: resp.prdy_ctrt,
+      stck_prpr: resp.stck_prpr,
+      stck_oprc: resp.stck_oprc, //주식 시가
+
+      stockName: stock_name,
     };
+    // console.log(resBody);
+    return res.status(200).json(respBody);
 
-    const result = axios
-      .request(config)
-      .then((response) => {
-        // console.log(JSON.stringify(response.data));
-        const resp = response.data.output;
-        const resBody = {
-          prdy_vrss: resp.prdy_vrss,
-          prdy_vrss_sign: resp.prdy_vrss_sign,
-          prdy_ctrt: resp.prdy_ctrt,
-          stck_prpr: resp.stck_prpr,
-          stck_oprc: resp.stck_oprc, //주식 시가
-
-          stockName: stock_name,
-        };
-        // console.log(resBody);
-        return res.status(200).json(resBody);
-      })
-      .catch((error) => {
-        // console.log(error);
-      });
   } catch (err) {
     console.error(err);
   }
@@ -370,6 +333,12 @@ router.post("/orderStock", jwtAuthenticator, async (req, res, next) => {
     const stockKey = req.body.stockKey;
     let transactionType = 0;
 
+    const party = await Parties.findOne({
+      where: {
+        partyKey: partyKey,
+      },
+    });
+
     if (tr_id === "VTTC0801U") {
       transactionType = "1";
     }
@@ -386,7 +355,6 @@ router.post("/orderStock", jwtAuthenticator, async (req, res, next) => {
     const partyInfo = await getPartyInfo(partyKey).then(
       (res) => res.dataValues
     );
-    // console.log("partyInfo", partyInfo);
 
     let config = {
       method: "post",
@@ -410,7 +378,7 @@ router.post("/orderStock", jwtAuthenticator, async (req, res, next) => {
         const msg1 = response.data.msg1;
 
         if (msg_cd === "40580000") {
-          console.log(response.data.msg1);
+          // console.log(response.data.msg1);
           return res.status(503).json({ msg_cd: msg_cd, msg1: msg1 });
         }
 
@@ -427,7 +395,34 @@ router.post("/orderStock", jwtAuthenticator, async (req, res, next) => {
             transactionType: transactionType,
           });
 
-          console.log("트랜잭션(주식 거래) 추가", transaction);
+          // console.log("트랜잭션(주식 거래) 추가", transaction);
+
+          //TODO 예수금 잘 바뀌는지 확인 필요
+          //파티의 예수금 업데이트
+          let config2 = {
+            method: "get",
+            maxBodyLength: Infinity,
+            url: `https://openapivts.koreainvestment.com:29443/uapi/domestic-stock/v1/trading/inquire-balance?CANO=${CANO}&ACNT_PRDT_CD=02&AFHR_FLPR_YN=N&OFL_YN=&INQR_DVSN=01&UNPR_DVSN=01&FUND_STTL_ICLD_YN=N&FNCG_AMT_AUTO_RDPT_YN=N&PRCS_DVSN=00&CTX_AREA_FK100=&CTX_AREA_NK100=`,
+            headers: {
+              "content-type": "application/json",
+              authorization: `Bearer ${U_TOKEN}`,
+              appkey: `${U_APPKEY}`,
+              appsecret: `${U_APPSECRET}`,
+              tr_id: "VTTC8434R",
+            },
+            // data: data,
+          };
+
+          const total_deposit = await axios
+            .request(config2)
+            .then((response) => {
+              const resp = response.data.output2[0];
+              return resp.dnca_tot_amt; // 총 예수금
+            });
+
+          // 총 예수금을 받아온 후에 파티의 deposit 수정
+          party.deposit = party.transferSum + total_deposit;
+          await party.save();
         }
 
         return res
@@ -542,12 +537,24 @@ router.get(
   async (req, res, next) => {
     const axios = require("axios");
 
-    function getYesterdayDate() {
+    function getPreviousBusinessDay() {
       const today = new Date();
-      const yesterday = new Date(today);
-      yesterday.setDate(yesterday.getDate() - 1);
-      yesterday.setHours(0, 0, 0, 0); // 시간을 00:00:00으로 설정
-      return yesterday;
+      let previousDay = new Date(today);
+
+      // If today is Sunday (0) or Monday (1), set previousDay to Friday (5)
+      const dayOfWeek = today.getDay();
+      if (dayOfWeek === 0) {
+        // Sunday
+        previousDay.setDate(today.getDate() - 2); // Set to Friday
+      } else if (dayOfWeek === 1) {
+        // Monday
+        previousDay.setDate(today.getDate() - 3); // Set to Friday
+      } else {
+        previousDay.setDate(today.getDate() - 1); // Set to previous day
+      }
+
+      previousDay.setHours(0, 0, 0, 0); // Set time to 00:00:00
+      return previousDay;
     }
 
     // 어제 날짜를 YYYYMMDD 형식의 문자열로 변환하는 함수
@@ -558,8 +565,9 @@ router.get(
       return `${year}${month}${day}0000`; //시간 0000으로 설정
     }
 
-    const yesterday = getYesterdayDate();
-    const dateTime = formatDate(yesterday);
+    const previousBusinessDay = getPreviousBusinessDay();
+    const dateTime = formatDate(previousBusinessDay);
+    // console.log(dateTime);
 
     const stockCode = req.params.stockKey;
 
@@ -574,7 +582,7 @@ router.get(
     axios
       .request(config)
       .then((response) => {
-        console.log(JSON.stringify(response.data));
+        // console.log("전일 종가", JSON.stringify(response.data));
 
         return res.status(200).json(response.data);
       })
@@ -583,5 +591,22 @@ router.get(
       });
   }
 );
+
+router.get("/stockInfo/:stockKey/price", async (req, res, next) => {
+  try {
+    const code = req.params.stockKey;
+    const mode = req.query.mode;
+    const from = req.query.from;
+    const to = req.query.to;
+    const result = await stockService.getPrice(code, mode, from, to);
+
+    return res.status(200).json({ result: result });
+
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ msg: error.message });
+  }
+
+})
 
 module.exports = router;
