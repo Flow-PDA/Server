@@ -5,7 +5,7 @@ const cheerio = require("cheerio");
 const iconv = require("iconv-lite");
 const dotenv = require("dotenv");
 const { jwtAuthenticator } = require("../middlewares/authenticator.js");
-const { db } = require("../modules");
+const { db, kisApi } = require("../modules");
 const Parties = db.Parties;
 
 const stockService = require("../services/stockService.js");
@@ -235,23 +235,37 @@ router.get("/inquired", async (req, res, next) => {
       },
       // data: data,
     };
-    const result = axios
-      .request(config)
-      .then((response) => {
-        // console.log(JSON.stringify(response.data));
-        const resp = response.data.output;
-        const resBody = {
-          prdy_vrss: resp.prdy_vrss,
-          prdy_vrss_sign: resp.prdy_vrss_sign,
-          prdy_ctrt: resp.prdy_ctrt,
-          stck_prpr: resp.stck_prpr,
-        };
-        console.log(resBody);
-        return res.status(200).json(resBody);
-      })
-      .catch((error) => {
-        // console.log(error);
-      });
+    // const result = axios
+    //   .request(config)
+    //   .then((response) => {
+    //     // console.log(JSON.stringify(response.data));
+    //     const resp = response.data.output;
+    //     const resBody = {
+    //       prdy_vrss: resp.prdy_vrss,
+    //       prdy_vrss_sign: resp.prdy_vrss_sign,
+    //       prdy_ctrt: resp.prdy_ctrt,
+    //       stck_prpr: resp.stck_prpr,
+    //     };
+    //     console.log(resBody);
+    //     return res.status(200).json(resBody);
+    //   })
+    //   .catch((error) => {
+    //     // console.log(error);
+    //   });
+
+    console.log(kisApi);
+    const response = await kisApi.instance.get(`?fid_cond_mrkt_div_code=J&fid_input_iscd=${stock_code}`);
+
+    const resp = response.data.output;
+    const resBody = {
+      prdy_vrss: resp.prdy_vrss,
+      prdy_vrss_sign: resp.prdy_vrss_sign,
+      prdy_ctrt: resp.prdy_ctrt,
+      stck_prpr: resp.stck_prpr,
+    };
+
+    return res.status(200).json(resBody);
+
   } catch (err) {
     console.error(err);
   }
@@ -280,26 +294,42 @@ router.get("/inquire", async (req, res, next) => {
       // data: data,
     };
 
-    const result = axios
-      .request(config)
-      .then((response) => {
-        // console.log(JSON.stringify(response.data));
-        const resp = response.data.output;
-        const resBody = {
-          prdy_vrss: resp.prdy_vrss,
-          prdy_vrss_sign: resp.prdy_vrss_sign,
-          prdy_ctrt: resp.prdy_ctrt,
-          stck_prpr: resp.stck_prpr,
-          stck_oprc: resp.stck_oprc, //주식 시가
+    // const result = axios
+    //   .request(config)
+    //   .then((response) => {
+    //     // console.log(JSON.stringify(response.data));
+    //     const resp = response.data.output;
+    //     const resBody = {
+    //       prdy_vrss: resp.prdy_vrss,
+    //       prdy_vrss_sign: resp.prdy_vrss_sign,
+    //       prdy_ctrt: resp.prdy_ctrt,
+    //       stck_prpr: resp.stck_prpr,
+    //       stck_oprc: resp.stck_oprc, //주식 시가
 
-          stockName: stock_name,
-        };
-        // console.log(resBody);
-        return res.status(200).json(resBody);
-      })
-      .catch((error) => {
-        // console.log(error);
-      });
+    //       stockName: stock_name,
+    //     };
+    //     // console.log(resBody);
+    //     return res.status(200).json(resBody);
+    //   })
+    //   .catch((error) => {
+    //     // console.log(error);
+    //   });
+
+    const response = await kisApi.instance.get(`?fid_cond_mrkt_div_code=J&fid_input_iscd=${stock_code}`);
+
+    const resp = response.data.output;
+    const respBody = {
+      prdy_vrss: resp.prdy_vrss,
+      prdy_vrss_sign: resp.prdy_vrss_sign,
+      prdy_ctrt: resp.prdy_ctrt,
+      stck_prpr: resp.stck_prpr,
+      stck_oprc: resp.stck_oprc, //주식 시가
+
+      stockName: stock_name,
+    };
+    // console.log(resBody);
+    return res.status(200).json(respBody);
+
   } catch (err) {
     console.error(err);
   }
