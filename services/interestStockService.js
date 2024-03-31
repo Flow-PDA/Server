@@ -45,7 +45,7 @@ module.exports.register = async (interestStockDto) => {
         );
 
         await Notification.create({
-          userKey: userKey,
+          userKey: member.userKey,
           partyKey: member.partyKey,
           type: 1,
           content: content,
