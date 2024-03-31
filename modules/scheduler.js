@@ -23,8 +23,8 @@ const resfreshTokens = schedule.scheduleJob(CRON_PER_12H, async function () {
       const token = await refreshToken(elem.appKey, elem.appSecret);
       // console.log(elem.partyKey);
       if (!token && token != "") {
-        console.log("update token", token);
-        console.log({ ...elem, token: token })
+        // console.log("update token", token);
+        // console.log({ ...elem, token: token })
         const result = await Party.update({ ...elem, token: token }, { where: { party_key: elem.partyKey } });
         console.log(result);
       }

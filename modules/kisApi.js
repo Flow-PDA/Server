@@ -9,6 +9,9 @@ const TOKEN = process.env.TOKEN;
 // can init at app startup
 const INIT_AT_STARTUP = process.env.INIT_AT_STARTUP || "";
 
+/**
+ * This instance is ONLY for INQUIRING APIS
+ */
 const instance = axios.create({
   baseURL: process.env.KIS_BASE_URL,
   headers: {
