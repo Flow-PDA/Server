@@ -1,10 +1,20 @@
 const schedule = require('node-schedule');
 const { refreshToken } = require('../utils/refreshToken');
-const { db } = require("./index");
+const { db, kisApi } = require("./index");
 const Party = db.Parties;
 
-const resfreshTokens = schedule.scheduleJob('0 */12 * * *', async function () {
+const APP_KEY = process.env.APP_KEY;
+const APP_SECRET = process.env.APP_SECRET;
+
+const CRON_PER_12H = '0 */12 * * *';
+const CRON_PER_2M = '*/2 * * * *';
+
+/**
+ * shceduled job : refresh tokens of Party per 12H
+ */
+const resfreshTokens = schedule.scheduleJob(CRON_PER_12H, async function () {
   console.log("shceduler");
+  // refresh Token of Parties at DB
   const parties = await Party.findAll();
   parties.forEach(async (elem) => {
     // console.log(elem.appKey);
@@ -21,4 +31,8 @@ const resfreshTokens = schedule.scheduleJob('0 */12 * * *', async function () {
     }
   });
 
+  // App's API Token
+  const appToken = await refreshToken(APP_KEY, APP_SECRET);
+  console.log(`Update App KIS token ${appToken}`);
+  kisApi.updateToken(appToken);
 })
