@@ -62,7 +62,7 @@ async function fetchNewsData(stock_name) {
         return { news_title, news_content, news_img, news_link };
       })
       .get();
-    console.log(result);
+    // console.log(result);
     return result;
   } catch (err) {
     console.error(err);
@@ -246,7 +246,7 @@ router.get("/inquired", async (req, res, next) => {
           prdy_ctrt: resp.prdy_ctrt,
           stck_prpr: resp.stck_prpr,
         };
-        console.log(resBody);
+        // console.log(resBody);
         return res.status(200).json(resBody);
       })
       .catch((error) => {
@@ -417,7 +417,7 @@ router.post("/orderStock", jwtAuthenticator, async (req, res, next) => {
         const msg1 = response.data.msg1;
 
         if (msg_cd === "40580000") {
-          console.log(response.data.msg1);
+          // console.log(response.data.msg1);
           return res.status(503).json({ msg_cd: msg_cd, msg1: msg1 });
         }
 
@@ -434,7 +434,7 @@ router.post("/orderStock", jwtAuthenticator, async (req, res, next) => {
             transactionType: transactionType,
           });
 
-          console.log("트랜잭션(주식 거래) 추가", transaction);
+          // console.log("트랜잭션(주식 거래) 추가", transaction);
 
           //TODO 예수금 잘 바뀌는지 확인 필요
           //파티의 예수금 업데이트
@@ -606,7 +606,7 @@ router.get(
 
     const previousBusinessDay = getPreviousBusinessDay();
     const dateTime = formatDate(previousBusinessDay);
-    console.log(dateTime);
+    // console.log(dateTime);
 
     const stockCode = req.params.stockKey;
 
@@ -621,7 +621,7 @@ router.get(
     axios
       .request(config)
       .then((response) => {
-        console.log("전일 종가", JSON.stringify(response.data));
+        // console.log("전일 종가", JSON.stringify(response.data));
 
         return res.status(200).json(response.data);
       })

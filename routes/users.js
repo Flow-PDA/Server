@@ -109,7 +109,7 @@ router.post("/logout", jwtAuthenticator, async (req, res, next) => {
   try {
     const verified = req.jwt.payload;
 
-    console.log(verified.key);
+    // console.log(verified.key);
 
     return res.status(200).json({ msg: "Done" });
   } catch (error) {

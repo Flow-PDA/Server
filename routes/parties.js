@@ -102,27 +102,26 @@ router.get("/", jwtAuthenticator, async (req, res, next) => {
   }
 });
 // [GET] user 속한 파티
-router.get("/user", jwtAuthenticator, async(req,res,next)=>{
-  try{
-    const key = req.jwt.payload
-    console.log("key",key)
-    return res.status(200).json(key)
-  }catch(err){
-    console.error(err)
+router.get("/user", jwtAuthenticator, async (req, res, next) => {
+  try {
+    const key = req.jwt.payload;
+    // console.log("key",key)
+    return res.status(200).json(key);
+  } catch (err) {
+    console.error(err);
   }
-})
+});
 // [GET] 특정 모임 조회하기
 router.get("/:partyKey", jwtAuthenticator, async (req, res, next) => {
   try {
     const result = await Party.findOne({
       where: { party_key: req.params.partyKey },
     });
-    const key = req.jwt
+    const key = req.jwt;
     const resBody = {
       msg: "특정 모임 조회 결과",
       result: result,
     };
-    
 
     return res.status(200).json(resBody);
   } catch (err) {
@@ -238,7 +237,7 @@ router.get("/:partyKey/admin", jwtAuthenticator, async (req, res, next) => {
     const result = await PartyMember.findOne({
       where: { party_key: partyKey, user_key: userKey },
     });
-    console.log(result.dataValues);
+    // console.log(result.dataValues);
     return res.status(200).json(result.dataValues);
   } catch (err) {
     console.error(err);
@@ -252,7 +251,7 @@ router.post("/:partyKey/user", jwtAuthenticator, async (req, res, next) => {
     const partyKey = req.params.partyKey;
     const userKey = req.body.userKey;
     const result = await User.findOne({ where: { user_key: userKey } });
-    console.log(result.dataValues);
+    // console.log(result.dataValues);
     const userDto = {
       userName: result.dataValues.name,
       userKey: result.dataValues.userKey,
@@ -270,7 +269,7 @@ router.delete(
   async (req, res, next) => {
     try {
       const userKey = req.query.userKey;
-      console.log(userKey);
+      // console.log(userKey);
       const result = await PartyMember.destroy({
         where: { user_key: userKey, party_key: req.params.partyKey },
       });

@@ -95,7 +95,7 @@ module.exports.vote = async (interestStockDto) => {
       where: { userKey: userKey, partyKey: partyKey },
     });
 
-    console.log(partyMember);
+    // console.log(partyMember);
 
     const partyMemberKey = partyMember.dataValues.partyMemberKey;
     let voteParticipant;
@@ -139,7 +139,7 @@ module.exports.changeApprovalResult = async (interestStockDto) => {
       where: { partyKey: partyKey },
     });
 
-    console.log(partyMemberCnt);
+    // console.log(partyMemberCnt);
 
     //찬성한 참여자 수
     const participantApprovalCnt = await Participant.count({

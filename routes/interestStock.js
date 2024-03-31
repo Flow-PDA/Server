@@ -69,7 +69,7 @@ router.get("/:partyKey/approval", jwtAuthenticator, async (req, res, next) => {
   try {
     const partyKey = req.params.partyKey;
     const result = await interestStockService.getApproval(partyKey);
-    console.log("didididid", result);
+    // console.log("didididid", result);
     const resBody = {
       msg: "승인 중인 관심 리스트 조회",
       result: result,
