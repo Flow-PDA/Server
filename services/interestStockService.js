@@ -6,6 +6,7 @@ const User = db.Users;
 const PartyMember = db.PartyMembers;
 const Participant = db.Participants;
 const Notification = db.Notifications;
+const Party = db.Parties;
 
 const noticeService = require("./noticeService.js");
 const partyService = require("./partyService.js");
@@ -34,6 +35,25 @@ module.exports.register = async (interestStockDto) => {
         partyKey: partyKey,
         isApproved: false,
       });
+
+      const interestStockKey = createdInterestStock.dataValues.interestStockKey;
+
+      const partyMemberInfo = await PartyMember.findOne({
+        where: {
+          userKey: userKey,
+          partyKey: partyKey,
+        },
+      });
+
+      const partyMemberKey = partyMemberInfo.dataValues.partyMemberKey;
+
+      await Participant.create({
+        interestStockKey: interestStockKey,
+        partyMemberKey: partyMemberKey,
+        isApproved: 1,
+      });
+
+      // console.log("이거야이거", voteParticipant);
 
       const partyMembers = await partyService.getPartyMember(partyKey);
       //알림 등록
@@ -120,7 +140,7 @@ module.exports.changeApprovalResult = async (interestStockDto) => {
       where: { partyKey: partyKey },
     });
 
-    console.log(partyMemberCnt);
+    // console.log(partyMemberCnt);
 
     //찬성한 참여자 수
     const participantApprovalCnt = await Participant.count({
