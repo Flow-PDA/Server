@@ -576,12 +576,24 @@ router.get(
   async (req, res, next) => {
     const axios = require("axios");
 
-    function getYesterdayDate() {
+    function getPreviousBusinessDay() {
       const today = new Date();
-      const yesterday = new Date(today);
-      yesterday.setDate(yesterday.getDate() - 1);
-      yesterday.setHours(0, 0, 0, 0); // 시간을 00:00:00으로 설정
-      return yesterday;
+      let previousDay = new Date(today);
+
+      // If today is Sunday (0) or Monday (1), set previousDay to Friday (5)
+      const dayOfWeek = today.getDay();
+      if (dayOfWeek === 0) {
+        // Sunday
+        previousDay.setDate(today.getDate() - 2); // Set to Friday
+      } else if (dayOfWeek === 1) {
+        // Monday
+        previousDay.setDate(today.getDate() - 3); // Set to Friday
+      } else {
+        previousDay.setDate(today.getDate() - 1); // Set to previous day
+      }
+
+      previousDay.setHours(0, 0, 0, 0); // Set time to 00:00:00
+      return previousDay;
     }
 
     // 어제 날짜를 YYYYMMDD 형식의 문자열로 변환하는 함수
@@ -592,8 +604,8 @@ router.get(
       return `${year}${month}${day}0000`; //시간 0000으로 설정
     }
 
-    const yesterday = getYesterdayDate();
-    const dateTime = formatDate(yesterday);
+    const previousBusinessDay = getPreviousBusinessDay();
+    const dateTime = formatDate(previousBusinessDay);
     console.log(dateTime);
 
     const stockCode = req.params.stockKey;
