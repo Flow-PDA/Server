@@ -1,5 +1,6 @@
 // controllers/tutorial.controller.js
 const { db } = require("../modules");
+const { getStockPrice } = require("../utils/naverStockApi");
 const InterestStock = db.InterestStocks;
 const Stock = db.Stocks;
 const User = db.Users;
@@ -98,3 +99,15 @@ module.exports.transact = async (transactionDto) => {
     console.log(error);
   }
 };
+
+module.exports.getPrice = async (code, mode, from, to) => {
+  try {
+    const response = await getStockPrice(code, mode, from, to);
+
+    console.log(response);
+    return response;
+  } catch (error) {
+    console.log(error)
+    throw { name: "APIError", message: error.message }
+  }
+}

@@ -592,4 +592,21 @@ router.get(
   }
 );
 
+router.get("/stockInfo/:stockKey/price", async (req, res, next) => {
+  try {
+    const code = req.params.stockKey;
+    const mode = req.query.mode;
+    const from = req.query.from;
+    const to = req.query.to;
+    const result = await stockService.getPrice(code, mode, from, to);
+
+    return res.status(200).json({ result: result });
+
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ msg: error.message });
+  }
+
+})
+
 module.exports = router;
