@@ -102,8 +102,7 @@ module.exports.transact = async (transactionDto) => {
 
 module.exports.getPrice = async (code, mode, from, to) => {
   try {
-    let response;
-    response = await getStockPrice(code, mode, from, to);
+    const response = await getStockPrice(code, mode, from, to);
 
     console.log(response);
     return response;
