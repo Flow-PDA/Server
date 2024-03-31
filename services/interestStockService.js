@@ -10,6 +10,7 @@ const Party = db.Parties;
 
 const noticeService = require("./noticeService.js");
 const partyService = require("./partyService.js");
+
 /**
  * 관심 목록 등록(투표 생성)
  * @param {*} interestStockDto stockKey, partyKey, userKey are required
@@ -65,7 +66,7 @@ module.exports.register = async (interestStockDto) => {
         );
 
         await Notification.create({
-          userKey: userKey,
+          userKey: member.userKey,
           partyKey: member.partyKey,
           type: 1,
           content: content,
@@ -194,7 +195,7 @@ module.exports.changeApprovalResult = async (interestStockDto) => {
  * @returns name, stockName, createdAt, partyMemberCnt, participantApprovalCnt
  */
 
-module.exports.getApproval = async (partyKey) => {
+module.exports.getApproval = async (partyKey, userKey) => {
   try {
     const interestStocks = await InterestStock.findAll({
       where: { partyKey: partyKey, isApproved: false },
@@ -231,7 +232,8 @@ module.exports.getApproval = async (partyKey) => {
       //파티멤버 키 가져오기
       const partyMemberKeyFind = await PartyMember.findOne({
         where: {
-          userKey: userNameFind.dataValues.userKey,
+          // userKey: userNameFind.dataValues.userKey,
+          userKey: userKey,
           partyKey: partyKey,
         },
       });

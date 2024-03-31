@@ -26,7 +26,7 @@ module.exports = (sequelize, Sequelize) => {
         defaultValue: 0,
       },
       content: {
-        type: Sequelize.STRING(30),
+        type: Sequelize.STRING(50),
       },
       isViewed: {
         type: Sequelize.BOOLEAN,
