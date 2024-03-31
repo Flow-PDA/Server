@@ -6,6 +6,14 @@ const instance = axios.create({
   baseURL: URL,
 })
 
+/**
+ * get Stock Price
+ * @param {Strign} code Stock code
+ * @param {Strign} mode might be minute, day, week, month
+ * @param {Strign} from date YYYYMMDDHHMM
+ * @param {Strign} to date YYYYMMDDHHMM
+ * @returns 
+ */
 async function getStockPrice(code, mode, from, to) {
   try {
     const resp = await instance.get(`/${code}/${mode}?startDateTime=${from}&endDateTime=${to}`);
