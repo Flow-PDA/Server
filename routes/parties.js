@@ -286,12 +286,4 @@ router.delete(
   }
 );
 
-//모임원 초대링크 보내기
-router.post("/:partyKey/invite", jwtAuthenticator, async (req, res, next) => {
-  try {
-  } catch (error) {
-    console.error(error);
-    throw new Error(error);
-  }
-});
 module.exports = router;
