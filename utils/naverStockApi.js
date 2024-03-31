@@ -6,16 +6,14 @@ const instance = axios.create({
   baseURL: URL,
 })
 
-async function getDataPerDay(code, from, to) {
+async function getStockPrice(code, mode, from, to) {
   try {
-    const resp = await instance.get(`/${code}/day?startDateTime=${from}&endDateTime=${to}`);
-    console.log(resp.data);
+    const resp = await instance.get(`/${code}/${mode}?startDateTime=${from}&endDateTime=${to}`);
+    // console.log(resp.data);
     return resp.data;
   } catch (error) {
     console.log(error);
   }
 }
 
-console.log(getDataPerDay);
-
-module.exports.getDataPerDay = getDataPerDay;
+module.exports.getStockPrice = getStockPrice;

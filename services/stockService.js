@@ -1,6 +1,6 @@
 // controllers/tutorial.controller.js
 const { db } = require("../modules");
-const { getDataPerDay } = require("../utils/naverStockApi");
+const { getStockPrice } = require("../utils/naverStockApi");
 const InterestStock = db.InterestStocks;
 const Stock = db.Stocks;
 const User = db.Users;
@@ -103,11 +103,7 @@ module.exports.transact = async (transactionDto) => {
 module.exports.getPrice = async (code, mode, from, to) => {
   try {
     let response;
-    if (mode === "day") {
-      response = await getDataPerDay(code, from, to);
-    } else if (mode === "month") {
-      response = await getDataPerDay(code, from, to);
-    }
+    response = await getStockPrice(code, mode, from, to);
 
     console.log(response);
     return response;
