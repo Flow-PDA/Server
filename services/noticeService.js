@@ -11,7 +11,7 @@ module.exports.getNotifications = async (userKey) => {
 
     const res = notices.map((notice) => ({
       notificationKey: notice.notificationKey,
-      partyKey : notice.partyKey,
+      partyKey: notice.partyKey,
       type: notice.type,
       content: notice.content,
       createdAt: notice.createdAt,
@@ -41,7 +41,7 @@ module.exports.getDelNotifications = async (notificationKey) => {
     //   isViewed: notice.isViewed,
     // }));
 
-    // return res;
+    return notices;
   } catch (error) {
     console.error(error);
   }
@@ -57,8 +57,8 @@ module.exports.checkNotification = async (notificationKey) => {
 
     await notice.update({ isViewed: true });
     await notice.save();
-
-    return notice;
+    // console.log(notice);
+    return notice.dataValues;
   } catch (error) {
     console.error(error);
   }
@@ -69,7 +69,7 @@ module.exports.checkUnNotification = async (userKey) => {
     const notice = await Notification.findAll({
       where: {
         userKey: userKey,
-        isViewed : false
+        isViewed: false,
       },
     });
 
