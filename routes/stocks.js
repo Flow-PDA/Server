@@ -220,7 +220,7 @@ router.get("/inquired", async (req, res, next) => {
     stock_code = req.query.stock_code;
     // console.log("code:", stock_code);
 
-    console.log(kisApi);
+    // console.log(kisApi);
     const response = await kisApi.instance.get(
       `inquire-price?fid_cond_mrkt_div_code=J&fid_input_iscd=${stock_code}`
     );
@@ -251,7 +251,7 @@ router.get("/inquire", async (req, res, next) => {
       `inquire-price?fid_cond_mrkt_div_code=J&fid_input_iscd=${stock_code}`
     );
 
-    console.log(response);
+    // console.log(response);
     const resp = response.data.output;
     const respBody = {
       prdy_vrss: resp.prdy_vrss,
