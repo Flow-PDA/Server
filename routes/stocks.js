@@ -34,6 +34,7 @@ const Stock = db.Stocks;
 //   },
 //   // data: data,
 // };
+
 // 네이버 뉴스 크롤링
 async function fetchNewsData(stock_name) {
   try {
@@ -220,7 +221,9 @@ router.get("/inquired", async (req, res, next) => {
     // console.log("code:", stock_code);
 
     console.log(kisApi);
-    const response = await kisApi.instance.get(`inquire-price?fid_cond_mrkt_div_code=J&fid_input_iscd=${stock_code}`);
+    const response = await kisApi.instance.get(
+      `inquire-price?fid_cond_mrkt_div_code=J&fid_input_iscd=${stock_code}`
+    );
 
     const resp = response.data.output;
     const resBody = {
@@ -230,7 +233,6 @@ router.get("/inquired", async (req, res, next) => {
       stck_prpr: resp.stck_prpr,
     };
     return res.status(200).json(resBody);
-
   } catch (err) {
     console.error(err);
   }
@@ -245,7 +247,9 @@ router.get("/inquire", async (req, res, next) => {
 
     const stock_name = resBody.dataValues.stockName;
 
-    const response = await kisApi.instance.get(`inquire-price?fid_cond_mrkt_div_code=J&fid_input_iscd=${stock_code}`);
+    const response = await kisApi.instance.get(
+      `inquire-price?fid_cond_mrkt_div_code=J&fid_input_iscd=${stock_code}`
+    );
 
     console.log(response);
     const resp = response.data.output;
@@ -260,7 +264,6 @@ router.get("/inquire", async (req, res, next) => {
     };
     // console.log(resBody);
     return res.status(200).json(respBody);
-
   } catch (err) {
     console.error(err);
   }
@@ -439,7 +442,7 @@ router.post("/orderStock", jwtAuthenticator, async (req, res, next) => {
   }
 });
 
-//거래 내역 조회
+//[GET] 거래 내역 조회
 router.get(
   "/:partyKey/transactionDetail",
   jwtAuthenticator,
@@ -456,7 +459,9 @@ router.get(
       return res.status(200).json(resBody);
     } catch (err) {
       console.error(err);
-      return res.status(500).json({ msg: "ERROR MESSAGE" });
+      return res
+        .status(500)
+        .json({ msg: "ERROR MESSAGE: 주식 거래 내역 GET 오류" });
     }
   }
 );
@@ -530,65 +535,70 @@ router.get("/:partyKey/balance", jwtAuthenticator, async (req, res, next) => {
   }
 });
 
-//주식 전일 종가 가져오기
+//[GET] 주식 전일 종가 가져오기
 router.get(
   "/stockInfo/:stockKey/endPrice",
   jwtAuthenticator,
   async (req, res, next) => {
-    const axios = require("axios");
+    try {
+      const axios = require("axios");
 
-    function getPreviousBusinessDay() {
-      const today = new Date();
-      let previousDay = new Date(today);
+      function getPreviousBusinessDay() {
+        const today = new Date();
+        let previousDay = new Date(today);
 
-      // If today is Sunday (0) or Monday (1), set previousDay to Friday (5)
-      const dayOfWeek = today.getDay();
-      if (dayOfWeek === 0) {
-        // Sunday
-        previousDay.setDate(today.getDate() - 2); // Set to Friday
-      } else if (dayOfWeek === 1) {
-        // Monday
-        previousDay.setDate(today.getDate() - 3); // Set to Friday
-      } else {
-        previousDay.setDate(today.getDate() - 1); // Set to previous day
+        // 일요일이거나 월요일이면 금요일로 설정
+        const dayOfWeek = today.getDay();
+        if (dayOfWeek === 0) {
+          // 일요일
+          previousDay.setDate(today.getDate() - 2);
+        } else if (dayOfWeek === 1) {
+          // 월요일
+          previousDay.setDate(today.getDate() - 3);
+        } else {
+          previousDay.setDate(today.getDate() - 1); // 전 날로
+        }
+
+        previousDay.setHours(0, 0, 0, 0); // Set time to 00:00:00
+        return previousDay;
       }
 
-      previousDay.setHours(0, 0, 0, 0); // Set time to 00:00:00
-      return previousDay;
-    }
+      // 어제 날짜를 YYYYMMDD 형식의 문자열로 변환하는 함수
+      function formatDate(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}${month}${day}0000`; //시간 0000으로 설정
+      }
 
-    // 어제 날짜를 YYYYMMDD 형식의 문자열로 변환하는 함수
-    function formatDate(date) {
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, "0");
-      const day = String(date.getDate()).padStart(2, "0");
-      return `${year}${month}${day}0000`; //시간 0000으로 설정
-    }
+      const previousBusinessDay = getPreviousBusinessDay();
+      const dateTime = formatDate(previousBusinessDay);
+      // console.log(dateTime);
 
-    const previousBusinessDay = getPreviousBusinessDay();
-    const dateTime = formatDate(previousBusinessDay);
-    // console.log(dateTime);
+      const stockCode = req.params.stockKey;
 
-    const stockCode = req.params.stockKey;
+      let config = {
+        method: "get",
+        maxBodyLength: Infinity,
 
-    let config = {
-      method: "get",
-      maxBodyLength: Infinity,
+        url: `https://api.stock.naver.com/chart/domestic/item/${stockCode}/day?startDateTime=${dateTime}&endDateTime=${dateTime}`,
+        headers: {},
+      };
 
-      url: `https://api.stock.naver.com/chart/domestic/item/${stockCode}/day?startDateTime=${dateTime}&endDateTime=${dateTime}`,
-      headers: {},
-    };
+      axios.request(config).then((response) => {
+        const resBody = {
+          msg: "전 영업일 종가 조회",
+          result: response.data,
+        };
 
-    axios
-      .request(config)
-      .then((response) => {
-        // console.log("전일 종가", JSON.stringify(response.data));
-
-        return res.status(200).json(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
+        return res.status(200).json(resBody);
       });
+    } catch (err) {
+      console.log(err);
+      return res
+        .status(500)
+        .json({ msg: "ERROR MESSAGE: 전 영업일 종가 GET 오류" });
+    }
   }
 );
 
