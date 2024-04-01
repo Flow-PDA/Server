@@ -621,6 +621,9 @@ router.get("/stockInfo/:stockKey/price", async (req, res, next) => {
     return res.status(200).json({ result: result });
   } catch (error) {
     console.log(error);
+    if (error.name === "NoContentError") {
+      return res.status(204).json({ msg: error.message });
+    }
     return res.status(500).json({ msg: error.message });
   }
 });

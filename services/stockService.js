@@ -104,10 +104,30 @@ module.exports.getPrice = async (code, mode, from, to) => {
   try {
     const response = await getStockPrice(code, mode, from, to);
 
-    console.log(response);
-    return response;
+    // console.log(response);
+    if (response.length === 0) {
+      throw { name: "NoContentError", message: `No content found at ${from}` };
+    }
+
+    if (mode === "minute") {
+      const stride =
+        (response.length / 40).toFixed(0) == 0
+          ? 1
+          : (response.length / 40).toFixed(0) > 10
+          ? 10
+          : (response.length / 40).toFixed(0);
+      const result = response.filter((elem, index) => {
+        return index % stride === 0;
+      });
+      console.log(result);
+      return result;
+    } else {
+      return response;
+    }
   } catch (error) {
-    console.log(error)
-    throw { name: "APIError", message: error.message }
+    console.log(error);
+    if (error.name === "NoContentError") throw error;
+
+    throw { name: "APIError", message: error.message };
   }
-}
+};
