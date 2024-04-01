@@ -402,15 +402,21 @@ router.post("/orderStock", jwtAuthenticator, async (req, res, next) => {
 
           //TODO 예수금 잘 바뀌는지 확인 필요
           //파티의 예수금 업데이트
+          const CANO = req.body.CANO;
+
+          const partyInfo = await getPartyInfo(partyKey).then(
+            (res) => res.dataValues
+          );
+
           let config2 = {
             method: "get",
             maxBodyLength: Infinity,
             url: `https://openapivts.koreainvestment.com:29443/uapi/domestic-stock/v1/trading/inquire-balance?CANO=${CANO}&ACNT_PRDT_CD=02&AFHR_FLPR_YN=N&OFL_YN=&INQR_DVSN=01&UNPR_DVSN=01&FUND_STTL_ICLD_YN=N&FNCG_AMT_AUTO_RDPT_YN=N&PRCS_DVSN=00&CTX_AREA_FK100=&CTX_AREA_NK100=`,
             headers: {
               "content-type": "application/json",
-              authorization: `Bearer ${U_TOKEN}`,
-              appkey: `${U_APPKEY}`,
-              appsecret: `${U_APPSECRET}`,
+              authorization: `Bearer ${partyInfo.token}`,
+              appkey: `${partyInfo.appKey}`,
+              appsecret: `${partyInfo.appSecret}`,
               tr_id: "VTTC8434R",
             },
             // data: data,
@@ -423,8 +429,10 @@ router.post("/orderStock", jwtAuthenticator, async (req, res, next) => {
               return resp.dnca_tot_amt; // 총 예수금
             });
 
+          console.log(total_deposit);
+
           // 총 예수금을 받아온 후에 파티의 deposit 수정
-          party.deposit = party.transferSum + total_deposit;
+          party.deposit = parseInt(party.transferSum) + parseInt(total_deposit);
           await party.save();
         }
 
@@ -611,12 +619,10 @@ router.get("/stockInfo/:stockKey/price", async (req, res, next) => {
     const result = await stockService.getPrice(code, mode, from, to);
 
     return res.status(200).json({ result: result });
-
   } catch (error) {
     console.log(error);
     return res.status(500).json({ msg: error.message });
   }
-
-})
+});
 
 module.exports = router;

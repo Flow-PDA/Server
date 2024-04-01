@@ -7,6 +7,7 @@ module.exports.getNotifications = async (userKey) => {
       where: {
         userKey: userKey,
       },
+      order: [["createdAt", "DESC"]],
     });
 
     const res = notices.map((notice) => ({
