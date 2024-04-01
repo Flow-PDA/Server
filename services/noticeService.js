@@ -7,11 +7,12 @@ module.exports.getNotifications = async (userKey) => {
       where: {
         userKey: userKey,
       },
+      order: [["createdAt", "DESC"]],
     });
 
     const res = notices.map((notice) => ({
       notificationKey: notice.notificationKey,
-      partyKey : notice.partyKey,
+      partyKey: notice.partyKey,
       type: notice.type,
       content: notice.content,
       createdAt: notice.createdAt,
@@ -69,7 +70,7 @@ module.exports.checkUnNotification = async (userKey) => {
     const notice = await Notification.findAll({
       where: {
         userKey: userKey,
-        isViewed : false
+        isViewed: false,
       },
     });
 
