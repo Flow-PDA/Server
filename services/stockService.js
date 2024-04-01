@@ -114,12 +114,12 @@ module.exports.getPrice = async (code, mode, from, to) => {
         (response.length / 40).toFixed(0) == 0
           ? 1
           : (response.length / 40).toFixed(0) > 10
-          ? 10
-          : (response.length / 40).toFixed(0);
+            ? 10
+            : (response.length / 40).toFixed(0);
       const result = response.filter((elem, index) => {
         return index % stride === 0;
       });
-      console.log(result);
+      // console.log(result);
       return result;
     } else {
       return response;
