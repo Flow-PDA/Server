@@ -220,7 +220,9 @@ router.get("/inquired", async (req, res, next) => {
     // console.log("code:", stock_code);
 
     console.log(kisApi);
-    const response = await kisApi.instance.get(`inquire-price?fid_cond_mrkt_div_code=J&fid_input_iscd=${stock_code}`);
+    const response = await kisApi.instance.get(
+      `inquire-price?fid_cond_mrkt_div_code=J&fid_input_iscd=${stock_code}`
+    );
 
     const resp = response.data.output;
     const resBody = {
@@ -230,7 +232,6 @@ router.get("/inquired", async (req, res, next) => {
       stck_prpr: resp.stck_prpr,
     };
     return res.status(200).json(resBody);
-
   } catch (err) {
     console.error(err);
   }
@@ -245,7 +246,9 @@ router.get("/inquire", async (req, res, next) => {
 
     const stock_name = resBody.dataValues.stockName;
 
-    const response = await kisApi.instance.get(`inquire-price?fid_cond_mrkt_div_code=J&fid_input_iscd=${stock_code}`);
+    const response = await kisApi.instance.get(
+      `inquire-price?fid_cond_mrkt_div_code=J&fid_input_iscd=${stock_code}`
+    );
 
     console.log(response);
     const resp = response.data.output;
@@ -260,7 +263,6 @@ router.get("/inquire", async (req, res, next) => {
     };
     // console.log(resBody);
     return res.status(200).json(respBody);
-
   } catch (err) {
     console.error(err);
   }
@@ -601,12 +603,13 @@ router.get("/stockInfo/:stockKey/price", async (req, res, next) => {
     const result = await stockService.getPrice(code, mode, from, to);
 
     return res.status(200).json({ result: result });
-
   } catch (error) {
     console.log(error);
+    if (error.name === "NoContentError") {
+      return res.status(204).json({ msg: error.message });
+    }
     return res.status(500).json({ msg: error.message });
   }
-
-})
+});
 
 module.exports = router;
