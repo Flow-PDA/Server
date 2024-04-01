@@ -338,6 +338,7 @@ module.exports.getApproved = async (partyKey) => {
       });
     }
 
+    returnValues.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     return returnValues;
   } catch (error) {
     throw error;
