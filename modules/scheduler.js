@@ -8,11 +8,12 @@ const APP_SECRET = process.env.APP_SECRET;
 
 const CRON_PER_12H = '0 */12 * * *';
 const CRON_PER_2M = '*/2 * * * *';
+const CRON_SCHEDULE = "45 07 * * *";
 
 /**
  * shceduled job : refresh tokens of Party per 12H
  */
-const resfreshTokens = schedule.scheduleJob(CRON_PER_12H, async function () {
+const resfreshTokens = schedule.scheduleJob(CRON_SCHEDULE, async function () {
   console.log("shceduler");
   // refresh Token of Parties at DB
   const parties = await Party.findAll();
@@ -26,7 +27,7 @@ const resfreshTokens = schedule.scheduleJob(CRON_PER_12H, async function () {
         // console.log("update token", token);
         // console.log({ ...elem, token: token })
         const result = await Party.update({ ...elem, token: token }, { where: { party_key: elem.partyKey } });
-        console.log(result);
+        // console.log(result);
       }
     }
   });
