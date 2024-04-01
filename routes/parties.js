@@ -49,8 +49,9 @@ async function fetchData() {
 }
 router.post("/", jwtAuthenticator, async (req, res, next) => {
   try {
-    const tempData = await fetchData(); // 데이터 가져오기
-    const tmp = tempData.output2[0];
+    // const tempData = await fetchData(); // 데이터 가져오기
+    // const tmp = tempData.output2[0];
+    // console.log(1)
     const userKey = req.jwt.payload.key;
     const partyDto = {
       name: req.body.name,
