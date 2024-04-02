@@ -53,8 +53,6 @@ module.exports.register = async (interestStockDto) => {
         isApproved: 1,
       });
 
-      // console.log("이거야이거", voteParticipant);
-
       const partyMembers = await partyService.getPartyMember(partyKey);
       //알림 등록
       partyMembers.map(async (member) => {
@@ -75,7 +73,6 @@ module.exports.register = async (interestStockDto) => {
 
       return createdInterestStock;
     } else {
-      console.log("이미 등록된 주식입니다!");
     }
   } catch (error) {
     throw error;
@@ -95,8 +92,6 @@ module.exports.vote = async (interestStockDto) => {
     const partyMember = await PartyMember.findOne({
       where: { userKey: userKey, partyKey: partyKey },
     });
-
-    // console.log(partyMember);
 
     const partyMemberKey = partyMember.dataValues.partyMemberKey;
     let voteParticipant;
@@ -139,8 +134,6 @@ module.exports.changeApprovalResult = async (interestStockDto) => {
     const partyMemberCnt = await PartyMember.count({
       where: { partyKey: partyKey },
     });
-
-    // console.log(partyMemberCnt);
 
     //찬성한 참여자 수
     const participantApprovalCnt = await Participant.count({

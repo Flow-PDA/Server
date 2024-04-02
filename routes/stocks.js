@@ -59,7 +59,6 @@ async function fetchNewsData(stock_name) {
         return { news_title, news_content, news_img, news_link };
       })
       .get();
-    // console.log(result);
     return result;
   } catch (err) {
     console.error(err);
@@ -70,7 +69,6 @@ async function fetchNewsData(stock_name) {
 router.get("/news", jwtAuthenticator, async (req, res, next) => {
   try {
     const stock_name = req.query.stock_name;
-    // console.log(stock_name);
     const response = await fetchNewsData(stock_name);
     return res.status(200).json(response);
   } catch (err) {
@@ -190,7 +188,6 @@ router.get("/hotIssue", async (req, res, next) => {
   try {
     // tag 타입 지정
     const tag = req.query.tag;
-    // console.log(tag);
     let config = {
       method: "get",
       maxBodyLength: Infinity,
@@ -203,7 +200,6 @@ router.get("/hotIssue", async (req, res, next) => {
     const result = axios
       .request(config)
       .then((response) => {
-        // console.log(response.data.dataBody);
         return res.status(200).json(response.data.dataBody);
       })
       .catch((error) => {
@@ -218,9 +214,6 @@ router.get("/hotIssue", async (req, res, next) => {
 router.get("/inquired", async (req, res, next) => {
   try {
     stock_code = req.query.stock_code;
-    // console.log("code:", stock_code);
-
-    // console.log(kisApi);
     const response = await kisApi.instance.get(
       `inquire-price?fid_cond_mrkt_div_code=J&fid_input_iscd=${stock_code}`
     );
@@ -241,8 +234,6 @@ router.get("/inquired", async (req, res, next) => {
 router.get("/inquire", async (req, res, next) => {
   try {
     const stock_code = req.query.stock_code;
-
-    // const stockKey = req.params.stockKey;
     const resBody = await stockService.getStockInfo(stock_code);
 
     const stock_name = resBody.dataValues.stockName;
@@ -251,7 +242,6 @@ router.get("/inquire", async (req, res, next) => {
       `inquire-price?fid_cond_mrkt_div_code=J&fid_input_iscd=${stock_code}`
     );
 
-    // console.log(response);
     const resp = response.data.output;
     const respBody = {
       prdy_vrss: resp.prdy_vrss,
@@ -262,7 +252,6 @@ router.get("/inquire", async (req, res, next) => {
 
       stockName: stock_name,
     };
-    // console.log(resBody);
     return res.status(200).json(respBody);
   } catch (err) {
     console.error(err);
@@ -294,7 +283,6 @@ router.post("/inquireDeposit", async (req, res, next) => {
     const result = axios
       .request(config)
       .then((response) => {
-        // console.log("value:", JSON.stringify(response.data.output2));
         const resp = response.data.output2[0];
         const resBody = {
           dnca_tot_amt: resp.dnca_tot_amt, //총 예수금
@@ -381,7 +369,6 @@ router.post("/orderStock", jwtAuthenticator, async (req, res, next) => {
         const msg1 = response.data.msg1;
 
         if (msg_cd === "40580000") {
-          // console.log(response.data.msg1);
           return res.status(503).json({ msg_cd: msg_cd, msg1: msg1 });
         }
 
@@ -397,8 +384,6 @@ router.post("/orderStock", jwtAuthenticator, async (req, res, next) => {
             volume: ORD_QTY,
             transactionType: transactionType,
           });
-
-          // console.log("트랜잭션(주식 거래) 추가", transaction);
 
           //TODO 예수금 잘 바뀌는지 확인 필요
           //파티의 예수금 업데이트
@@ -428,8 +413,6 @@ router.post("/orderStock", jwtAuthenticator, async (req, res, next) => {
               const resp = response.data.output2[0];
               return resp.dnca_tot_amt; // 총 예수금
             });
-
-          console.log(total_deposit);
 
           // 총 예수금을 받아온 후에 파티의 deposit 수정
           party.deposit = parseInt(party.transferSum) + parseInt(total_deposit);
@@ -481,7 +464,6 @@ router.get("/:partyKey/balance", jwtAuthenticator, async (req, res, next) => {
     const partyInfo = await getPartyInfo(partyKey); // 계좌 앞 8자리
     const CANO = partyInfo.accountNumber;
 
-    // console.log("CANO", CANO);
     const ACNT_PRDT_CD = "01"; // req.body.ACNT_PRDT_CD; //계좌 뒤 2자리 01
     const AFHR_FLPR_YN = "N";
     const OFL_YN = "";
@@ -510,7 +492,6 @@ router.get("/:partyKey/balance", jwtAuthenticator, async (req, res, next) => {
       .request(config)
       .then((response) => {
         const output1 = response.data.output1;
-        // console.log("아웃풋!!!!!", output1);
 
         if (!output1) {
           throw new Error("Output1 is undefined in API response");
@@ -530,7 +511,6 @@ router.get("/:partyKey/balance", jwtAuthenticator, async (req, res, next) => {
           };
           return resData;
         });
-        // console.log("야야야야야야", resBody);
         return res.status(200).json(resBody);
       })
       .catch((error) => {
@@ -581,7 +561,6 @@ router.get(
 
       const previousBusinessDay = getPreviousBusinessDay();
       const dateTime = formatDate(previousBusinessDay);
-      // console.log(dateTime);
 
       const stockCode = req.params.stockKey;
 

@@ -8,7 +8,6 @@ const { jwtAuthenticator } = require("../middlewares/authenticator.js");
 router.get("/allnoti", jwtAuthenticator, async (req, res, next) => {
   try {
     const userKey = req.jwt.payload.key;
-    // console.log(userKey);
     const notices = await noticeService.getNotifications(userKey);
 
     const resBody = {
@@ -49,7 +48,6 @@ router.delete(
     try {
       const userKey = req.jwt.payload.key;
       const notificationKey = req.params.notificationKey;
-      console.log(userKey);
       const notices = await noticeService.getDelNotifications(notificationKey);
 
       const resBody = {
@@ -95,7 +93,6 @@ router.put("/", jwtAuthenticator, async (req, res, next) => {
 router.put("/readAll", jwtAuthenticator, async (req, res, next) => {
   try {
     const userKey = req.jwt.payload.key;
-    // console.log(userKey);
     const notices = await noticeService.checkAllNotification(userKey);
 
     if (notices) {

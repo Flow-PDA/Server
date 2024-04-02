@@ -21,23 +21,11 @@ async function refreshToken(appKey, appSecret) {
 
   try {
     const response = await axios.request(config);
-    // console.log(JSON.stringify(response.data));
     console.log(`KIS API token refreshed : ${response.data.access_token}`);
     return response.data.access_token;
   } catch (error) {
     return "";
   }
-
-
-  // .then((response) => {
-  //   // console.log(JSON.stringify(response.data));
-  //   console.log(`KIS API token refreshed : ${response.data.access_token}`);
-  //   return response.data.access_token;
-  // })
-  // .catch((error) => {
-  //   console.log(error);
-  //   return "";
-  // });
 }
 
 module.exports.refreshToken = refreshToken;

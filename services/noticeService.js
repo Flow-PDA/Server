@@ -58,7 +58,6 @@ module.exports.checkNotification = async (notificationKey) => {
 
     await notice.update({ isViewed: true });
     await notice.save();
-    // console.log(notice);
     return notice.dataValues;
   } catch (error) {
     console.error(error);
@@ -147,7 +146,6 @@ module.exports.ContentByType = async (
 
   switch (type) {
     case 1: //	투표 등록 알림
-      // console.log("party", party);
       content = `${party.name} 모임의 ${stock.stockName} 종목 투표가 등록되었습니다.`;
       break;
     case 2: // 투표 완료 알림 - 수락/거절 둘다?
