@@ -11,13 +11,11 @@ const bcrypt = require("bcrypt");
  * @throws SequelizeUniqueConstraintError - if email already exists
  */
 module.exports.signup = async (userDto) => {
-  // console.log(userDto);
   const salt = await bcrypt.genSalt();
   const hashedPassword = await bcrypt.hash(userDto.password, salt);
 
   userDto.password = hashedPassword;
   const res = await User.create(userDto);
-  // console.log(res);
   return res.dataValues;
 };
 
@@ -103,7 +101,6 @@ module.exports.modify = async (userKey, modifyUserDto) => {
     { where: { userKey: userKey } }
   );
 
-  // console.log(result); 1 or 0
 
   return result;
 };
@@ -116,6 +113,5 @@ module.exports.modify = async (userKey, modifyUserDto) => {
 module.exports.delete = async (userKey) => {
   const result = await User.destroy({ where: { userKey: userKey } });
 
-  // console.log(result); 1 or 0
   return result;
 };

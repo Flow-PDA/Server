@@ -27,7 +27,6 @@ module.exports.transfer = async (TransferDetailDto) => {
 
   party.deposit -= TransferDetailDto.price;
   party.transferSum -= TransferDetailDto.price;
-  // console.log(party.deposit);
   await party.save();
 
   // 이체 상세 정보 생성
@@ -35,8 +34,6 @@ module.exports.transfer = async (TransferDetailDto) => {
     ...TransferDetailDto,
     deposit: party.deposit,
   });
-
-  // console.log(transferDetail);
 
   //알림 시작
   const partyMembers = await partyService.getPartyMember(
@@ -121,8 +118,6 @@ module.exports.getRecentTransferList = async (partyKey) => {
 
       order: [["createdAt", "DESC"]],
     });
-
-    // console.log(transferDetails);
 
     if (!transferDetails || transferDetails.length === 0) {
       throw new Error("No recent transaction detail found");

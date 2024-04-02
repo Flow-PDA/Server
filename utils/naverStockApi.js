@@ -19,7 +19,6 @@ async function getStockPrice(code, mode, from, to) {
     const resp = await instance.get(
       `/${code}/${mode}?startDateTime=${from}&endDateTime=${to}`
     );
-    // console.log(resp);
     return resp.data;
   } catch (error) {
     console.log(error);
