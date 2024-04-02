@@ -6,12 +6,13 @@ module.exports.getNotifications = async (userKey) => {
     const notices = await Notification.findAll({
       where: {
         userKey: userKey,
-        isViewed: false,
       },
+      order: [["createdAt", "DESC"]],
     });
 
     const res = notices.map((notice) => ({
       notificationKey: notice.notificationKey,
+      partyKey: notice.partyKey,
       type: notice.type,
       content: notice.content,
       createdAt: notice.createdAt,
@@ -19,6 +20,29 @@ module.exports.getNotifications = async (userKey) => {
     }));
 
     return res;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+module.exports.getDelNotifications = async (notificationKey) => {
+  try {
+    const notices = await Notification.destroy({
+      where: {
+        notificationKey: notificationKey,
+        // isViewed : false
+      },
+    });
+
+    // const res = notices.map((notice) => ({
+    //   notificationKey: notice.notificationKey,
+    //   type: notice.type,
+    //   content: notice.content,
+    //   createdAt: notice.createdAt,
+    //   isViewed: notice.isViewed,
+    // }));
+
+    return notices;
   } catch (error) {
     console.error(error);
   }
@@ -34,8 +58,23 @@ module.exports.checkNotification = async (notificationKey) => {
 
     await notice.update({ isViewed: true });
     await notice.save();
+    // console.log(notice);
+    return notice.dataValues;
+  } catch (error) {
+    console.error(error);
+  }
+};
 
-    return notice;
+module.exports.checkUnNotification = async (userKey) => {
+  try {
+    const notice = await Notification.findAll({
+      where: {
+        userKey: userKey,
+        isViewed: false,
+      },
+    });
+
+    return notice.length;
   } catch (error) {
     console.error(error);
   }

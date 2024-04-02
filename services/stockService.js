@@ -1,5 +1,6 @@
 // controllers/tutorial.controller.js
 const { db } = require("../modules");
+const { getStockPrice } = require("../utils/naverStockApi");
 const InterestStock = db.InterestStocks;
 const Stock = db.Stocks;
 const User = db.Users;
@@ -57,7 +58,7 @@ module.exports.getTransactionDetail = async (partyKey) => {
 //주식코드로 주식 정보 얻어오기
 module.exports.getStockInfo = async (stockKey) => {
   try {
-    console.log(parseInt(stockKey));
+    // console.log(parseInt(stockKey));
     if (/^[A-Za-z]/.test(stockKey)) {
       // 주식 코드에 알파벳이 있는 경우
       const stockInfo = await Stock.findOne({
@@ -75,10 +76,58 @@ module.exports.getStockInfo = async (stockKey) => {
         },
       });
 
-      console.log(stockInfo);
+      // console.log(stockInfo);
       return stockInfo; // 앞에 붙은 0을 제거하여 문자열로 변환
     }
   } catch (error) {
     console.error(error);
+  }
+};
+
+/**
+ * 주식 매수/매도 시 trancsaction Detail 추가
+ * create transactionDetail
+ * @param {*} transactionDto userKey, partyKey, stockKey, price, volume, transaction_type
+ * @returns created TransactionDetail info
+ */
+
+module.exports.transact = async (transactionDto) => {
+  try {
+    const res = await TransactionDetail.create(transactionDto);
+    return res.dataValues;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+module.exports.getPrice = async (code, mode, from, to) => {
+  try {
+    const response = await getStockPrice(code, mode, from, to);
+
+    // console.log(response);
+    if (response.length === 0) {
+      throw { name: "NoContentError", message: `No content found at ${from}` };
+    }
+
+    if (mode === "minute") {
+      const stride =
+        (response.length / 40).toFixed(0) == 0
+          ? 1
+          : (response.length / 40).toFixed(0) > 10
+            ? 10
+            : (response.length / 40).toFixed(0);
+      const result = response.filter((elem, index) => {
+        return index % stride === 0;
+      });
+      // console.log(result);
+      return result;
+    } else {
+      return response;
+    }
+  } catch (error) {
+    console.log(error);
+    if (error.name === "NoContentError") throw error;
+
+    throw { name: "APIError", message: error.message };
   }
 };

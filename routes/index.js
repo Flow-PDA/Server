@@ -19,7 +19,7 @@ router.use("/interests", interestStockRouter);
 router.use("/parties", partiesRouter);
 router.use("/transfers", transfersRouter);
 router.use("/stocks", stocksRouter);
-router.use("/notifications", noticeRouter);
+router.use("/notices", noticeRouter);
 router.use("/points", pointRouter);
 
 module.exports = router;

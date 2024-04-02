@@ -6,9 +6,11 @@ const User = db.Users;
 const PartyMember = db.PartyMembers;
 const Participant = db.Participants;
 const Notification = db.Notifications;
+const Party = db.Parties;
 
 const noticeService = require("./noticeService.js");
 const partyService = require("./partyService.js");
+
 /**
  * 관심 목록 등록(투표 생성)
  * @param {*} interestStockDto stockKey, partyKey, userKey are required
@@ -34,6 +36,25 @@ module.exports.register = async (interestStockDto) => {
         isApproved: false,
       });
 
+      const interestStockKey = createdInterestStock.dataValues.interestStockKey;
+
+      const partyMemberInfo = await PartyMember.findOne({
+        where: {
+          userKey: userKey,
+          partyKey: partyKey,
+        },
+      });
+
+      const partyMemberKey = partyMemberInfo.dataValues.partyMemberKey;
+
+      await Participant.create({
+        interestStockKey: interestStockKey,
+        partyMemberKey: partyMemberKey,
+        isApproved: 1,
+      });
+
+      // console.log("이거야이거", voteParticipant);
+
       const partyMembers = await partyService.getPartyMember(partyKey);
       //알림 등록
       partyMembers.map(async (member) => {
@@ -45,7 +66,7 @@ module.exports.register = async (interestStockDto) => {
         );
 
         await Notification.create({
-          userKey: userKey,
+          userKey: member.userKey,
           partyKey: member.partyKey,
           type: 1,
           content: content,
@@ -75,7 +96,7 @@ module.exports.vote = async (interestStockDto) => {
       where: { userKey: userKey, partyKey: partyKey },
     });
 
-    console.log(partyMember);
+    // console.log(partyMember);
 
     const partyMemberKey = partyMember.dataValues.partyMemberKey;
     let voteParticipant;
@@ -119,7 +140,7 @@ module.exports.changeApprovalResult = async (interestStockDto) => {
       where: { partyKey: partyKey },
     });
 
-    console.log(partyMemberCnt);
+    // console.log(partyMemberCnt);
 
     //찬성한 참여자 수
     const participantApprovalCnt = await Participant.count({
@@ -174,7 +195,7 @@ module.exports.changeApprovalResult = async (interestStockDto) => {
  * @returns name, stockName, createdAt, partyMemberCnt, participantApprovalCnt
  */
 
-module.exports.getApproval = async (partyKey) => {
+module.exports.getApproval = async (partyKey, userKey) => {
   try {
     const interestStocks = await InterestStock.findAll({
       where: { partyKey: partyKey, isApproved: false },
@@ -211,10 +232,12 @@ module.exports.getApproval = async (partyKey) => {
       //파티멤버 키 가져오기
       const partyMemberKeyFind = await PartyMember.findOne({
         where: {
-          userKey: userNameFind.dataValues.userKey,
+          // userKey: userNameFind.dataValues.userKey,
+          userKey: userKey,
           partyKey: partyKey,
         },
       });
+
       const partyMemberKey = partyMemberKeyFind.dataValues.partyMemberKey;
 
       //모임 멤버 중 승인자 수
@@ -292,9 +315,10 @@ module.exports.getApproved = async (partyKey) => {
 
       const interestStockKey = stock.dataValues.interestStockKey;
       const stockName = stockNameFind.dataValues.stockName;
+      const stockKey = stockNameFind.dataValues.stockKey;
 
       //로그인한 사람이 이 주식을 이미 승인 했는지 안했는지
-      const isApproved = await this.isParticipated(
+      let isApproved = await this.isParticipated(
         partyMemberKey,
         interestStockKey
       );
@@ -306,6 +330,7 @@ module.exports.getApproved = async (partyKey) => {
       returnValues.push({
         name: userName,
         interestStockKey: interestStockKey,
+        stockKey: stockKey,
         stockName: stockName,
         createdAt: interestStock.createdAt,
         partyMemberKey: partyMemberKey,
@@ -313,6 +338,7 @@ module.exports.getApproved = async (partyKey) => {
       });
     }
 
+    returnValues.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     return returnValues;
   } catch (error) {
     throw error;

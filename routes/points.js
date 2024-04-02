@@ -33,7 +33,7 @@ async function fetchKospiData() {
         };
       })
       .get();
-    console.log(alpha);
+    // console.log(alpha);
     return alpha;
   } catch (err) {
     console.error(err);
@@ -63,7 +63,7 @@ async function fetchKosdaqData() {
         };
       })
       .get();
-    console.log(alpha);
+    // console.log(alpha);
     return alpha;
   } catch (err) {
     console.error(err);
@@ -94,7 +94,7 @@ async function fetchNasdaqData() {
         };
       })
       .get();
-    console.log(alpha);
+    // console.log(alpha);
     return alpha;
   } catch (err) {
     console.error(err);
